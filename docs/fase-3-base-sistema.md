@@ -11,7 +11,7 @@ Criar a base web do Mini ERP e conectar o app ao Supabase.
 - Cliente Supabase criado.
 - Variaveis locais configuradas.
 - Build validado.
-- Banco ainda precisa ser executado no Supabase.
+- Banco executado e validado no Supabase.
 
 ## Entregas iniciais
 
@@ -23,14 +23,16 @@ Criar a base web do Mini ERP e conectar o app ao Supabase.
 | SQL com RLS | Preparado |
 | Seed demonstrativo | Preparado |
 | Query de validacao | Preparada |
-| Execucao no Supabase | Pendente |
+| Execucao no Supabase | Concluida |
+| Ajustes do Supabase Advisor | Concluidos |
 
 ## Proximo passo
 
-Executar os arquivos SQL no Supabase:
+Banco inicial executado no Supabase:
 
 1. `database/migrations/001_initial_schema.sql`
-2. `database/seed/001_seed_demo.sql`
-3. `database/verification/001_check_schema.sql`
+2. `database/migrations/002_supabase_advisor_fixes.sql`
+3. `database/seed/001_seed_demo.sql`
+4. `database/verification/001_check_schema.sql`
 
-Depois disso, a proxima entrega da Fase 3 sera validar uma consulta real do app e iniciar o login.
+Proxima entrega da Fase 3: validar uma consulta real do app usando usuario autenticado e iniciar o login.

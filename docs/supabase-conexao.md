@@ -7,6 +7,10 @@
 - Publishable key local configurada em `.env.local`.
 - `.env.local` esta ignorado pelo Git.
 - App Next.js compila com a configuracao local.
+- Schema inicial executado no Supabase.
+- Seed demonstrativo executado no Supabase.
+- Ajustes do Supabase Advisor executados.
+- Advisor de seguranca sem alertas apos a correcao.
 
 ## Como executar o banco pela primeira vez
 
@@ -19,10 +23,29 @@ Como a publishable key e uma chave de navegador, ela nao pode criar tabelas. Par
 3. Criar uma nova query.
 4. Copiar e executar o conteudo de `database/migrations/001_initial_schema.sql`.
 5. Criar outra query.
-6. Copiar e executar o conteudo de `database/seed/001_seed_demo.sql`.
-7. Copiar e executar o conteudo de `database/verification/001_check_schema.sql`.
+6. Copiar e executar o conteudo de `database/migrations/002_supabase_advisor_fixes.sql`.
+7. Criar outra query.
+8. Copiar e executar o conteudo de `database/seed/001_seed_demo.sql`.
+9. Copiar e executar o conteudo de `database/verification/001_check_schema.sql`.
 
 Se a ultima query mostrar unidades, estoque e uma brassagem demonstrativa, o banco inicial esta pronto.
+
+## Validacao feita em 14/09/2026
+
+- Projeto localizado: `ERP_cervejaria`.
+- Projeto ativo e saudavel.
+- PostgreSQL: 17.6.
+- Tabelas publicas criadas: 13.
+- Todas as tabelas publicas com RLS ativo.
+- Unidades demonstrativas criadas: 7.
+- Itens demonstrativos criados: 4.
+- Lotes demonstrativos criados: 4.
+- Movimentos iniciais de estoque criados: 4.
+- Receita demonstrativa criada: `IPA Citra 20 L`.
+- Brassagem demonstrativa criada: `BR-0001`.
+- Advisor de seguranca: sem alertas.
+
+O Advisor de performance ainda pode mostrar indices como nao usados. Isso e esperado em banco recem-criado, antes de uso real pelo app.
 
 ### Opcao 2: Supabase MCP no Codex
 
