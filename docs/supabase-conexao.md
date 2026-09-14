@@ -25,8 +25,12 @@ Como a publishable key e uma chave de navegador, ela nao pode criar tabelas. Par
 5. Criar outra query.
 6. Copiar e executar o conteudo de `database/migrations/002_supabase_advisor_fixes.sql`.
 7. Criar outra query.
-8. Copiar e executar o conteudo de `database/seed/001_seed_demo.sql`.
-9. Copiar e executar o conteudo de `database/verification/001_check_schema.sql`.
+8. Copiar e executar o conteudo de `database/migrations/003_traduzir_modelo_para_portugues.sql`.
+9. Criar outra query.
+10. Copiar e executar o conteudo de `database/migrations/004_traduzir_nomes_internos.sql`.
+11. Criar outra query.
+12. Copiar e executar o conteudo de `database/seed/001_seed_demo.sql`.
+13. Copiar e executar o conteudo de `database/verification/001_check_schema.sql`.
 
 Se a ultima query mostrar unidades, estoque e uma brassagem demonstrativa, o banco inicial esta pronto.
 
@@ -37,6 +41,7 @@ Se a ultima query mostrar unidades, estoque e uma brassagem demonstrativa, o ban
 - PostgreSQL: 17.6.
 - Tabelas publicas criadas: 13.
 - Todas as tabelas publicas com RLS ativo.
+- Tabelas, colunas, tipos, views e nomes internos traduzidos para portugues.
 - Unidades demonstrativas criadas: 7.
 - Itens demonstrativos criados: 4.
 - Lotes demonstrativos criados: 4.
@@ -44,6 +49,8 @@ Se a ultima query mostrar unidades, estoque e uma brassagem demonstrativa, o ban
 - Receita demonstrativa criada: `IPA Citra 20 L`.
 - Brassagem demonstrativa criada: `BR-0001`.
 - Advisor de seguranca: sem alertas.
+- Migração de tradução aplicada: `traduzir_modelo_para_portugues`.
+- Migração de nomes internos aplicada: `traduzir_nomes_internos`.
 
 O Advisor de performance ainda pode mostrar indices como nao usados. Isso e esperado em banco recem-criado, antes de uso real pelo app.
 

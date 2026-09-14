@@ -25,6 +25,8 @@ Esta fase ainda nao cria as telas. Ela define o esqueleto dos dados que as telas
 | Arquivo | Uso |
 | --- | --- |
 | `database/migrations/001_initial_schema.sql` | Cria tabelas, tipos, indices, triggers e views iniciais |
+| `database/migrations/003_traduzir_modelo_para_portugues.sql` | Traduz tabelas, colunas, tipos e views para portugues |
+| `database/migrations/004_traduzir_nomes_internos.sql` | Traduz constraints, indices, triggers e policies para portugues |
 | `database/seed/001_seed_demo.sql` | Insere unidades, itens, lotes, estoque inicial e receita de exemplo |
 | `docs/fase-2-modelo-dados.md` | Explica o modelo e as regras principais |
 
@@ -32,19 +34,19 @@ Esta fase ainda nao cria as telas. Ela define o esqueleto dos dados que as telas
 
 | Tabela | Responsabilidade |
 | --- | --- |
-| `app_users` | Usuarios do sistema |
-| `suppliers` | Fornecedores simples |
-| `units` | Unidades de medida |
-| `items` | Insumos, embalagens e produtos de referencia |
-| `item_lots` | Lotes, validade e custo unitario |
-| `stock_movements` | Entradas, baixas, ajustes, consumo e perdas |
-| `recipes` | Receitas principais |
-| `recipe_versions` | Versoes de uma receita |
-| `recipe_inputs` | Insumos previstos por versao da receita |
-| `brew_batches` | Brassagens |
-| `brew_batch_consumptions` | Consumo previsto e real por brassagem |
-| `brew_batch_extra_costs` | Custos extras como embalagem e utilidades |
-| `brew_batch_events` | Historico simples de eventos da brassagem |
+| `usuarios_app` | Usuarios do sistema |
+| `fornecedores` | Fornecedores simples |
+| `unidades` | Unidades de medida |
+| `itens` | Insumos, embalagens e produtos de referencia |
+| `lotes_itens` | Lotes, validade e custo unitario |
+| `movimentacoes_estoque` | Entradas, baixas, ajustes, consumo e perdas |
+| `receitas` | Receitas principais |
+| `versoes_receitas` | Versoes de uma receita |
+| `insumos_receita` | Insumos previstos por versao da receita |
+| `brassagens` | Brassagens |
+| `consumos_brassagem` | Consumo previsto e real por brassagem |
+| `custos_extras_brassagem` | Custos extras como embalagem e utilidades |
+| `eventos_brassagem` | Historico simples de eventos da brassagem |
 
 ## Regras importantes
 
@@ -58,7 +60,7 @@ Isso permite iniciar simples e ainda manter historico de onde cada lote veio.
 
 No MVP, produto acabado nao tera estoque separado.
 
-O resultado da producao fica em `brew_batches.final_volume_liters`. Isso evita criar um segundo controle de estoque antes de termos o fluxo principal validado.
+O resultado da producao fica em `brassagens.volume_final_litros`. Isso evita criar um segundo controle de estoque antes de termos o fluxo principal validado.
 
 ### Desconto de estoque
 
@@ -66,31 +68,31 @@ A brassagem pode registrar consumo durante o processo, mas o saldo do estoque so
 
 No banco isso aparece assim:
 
-- `brew_batch_consumptions` guarda o consumo real.
-- `stock_movements` recebe o movimento do tipo `batch_consumption`.
-- `brew_batches.stock_posted_at` marca quando a baixa foi lançada.
+- `consumos_brassagem` guarda o consumo real.
+- `movimentacoes_estoque` recebe o movimento do tipo `consumo_brassagem`.
+- `brassagens.estoque_baixado_em` marca quando a baixa foi lançada.
 
 Na fase do app, a acao "Finalizar brassagem" devera:
 
 1. validar se os consumos reais foram informados;
-2. criar as baixas em `stock_movements`;
-3. preencher `final_volume_liters`;
+2. criar as baixas em `movimentacoes_estoque`;
+3. preencher `volume_final_litros`;
 4. calcular perdas e custo real;
-5. marcar `stock_posted_at`;
-6. mudar status para `finalized`.
+5. marcar `estoque_baixado_em`;
+6. mudar status para `finalizada`.
 
 ## Views iniciais
 
 | View | Uso |
 | --- | --- |
-| `v_stock_balances` | Mostra saldo por item e lote, com status de estoque |
-| `v_brew_batch_costs` | Calcula perda, custo de insumos, custo extra, custo total e custo por litro |
+| `vw_saldos_estoque` | Mostra saldo por item e lote, com status de estoque |
+| `vw_custos_brassagem` | Calcula perda, custo de insumos, custo extra, custo total e custo por litro |
 
 ## Pontos para revisar antes da Fase 3
 
 - Confirmar se as unidades do MVP bastam: kg, g, l, ml, un, pct e cil.
-- Confirmar se o campo `reference_cost` em `items` sera usado como custo previsto.
-- Confirmar se perdas de estoque fora da brassagem usam `stock_movements.loss`.
+- Confirmar se o campo `custo_referencia` em `itens` sera usado como custo previsto.
+- Confirmar se perdas de estoque fora da brassagem usam `movimentacoes_estoque.tipo_movimentacao = 'perda'`.
 - Confirmar se embalagem sera registrada como item de estoque e tambem como custo de envase.
 - Executar e validar o SQL inicial no Supabase criado.
 

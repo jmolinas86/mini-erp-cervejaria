@@ -1,106 +1,106 @@
--- Demo data for local review.
--- Safe to run after database/migrations/001_initial_schema.sql.
+-- Dados de demonstracao.
+-- Rodar depois das migracoes em database/migrations.
 
-insert into public.units (code, name, kind, decimal_places) values
-  ('kg', 'Quilograma', 'mass', 3),
-  ('g', 'Grama', 'mass', 3),
+insert into public.unidades (codigo, nome, tipo, casas_decimais) values
+  ('kg', 'Quilograma', 'massa', 3),
+  ('g', 'Grama', 'massa', 3),
   ('l', 'Litro', 'volume', 3),
   ('ml', 'Mililitro', 'volume', 3),
-  ('un', 'Unidade', 'count', 0),
-  ('pct', 'Pacote', 'count', 0),
-  ('cil', 'Cilindro', 'count', 0)
-on conflict (code) do nothing;
+  ('un', 'Unidade', 'contagem', 0),
+  ('pct', 'Pacote', 'contagem', 0),
+  ('cil', 'Cilindro', 'contagem', 0)
+on conflict (codigo) do nothing;
 
-insert into public.app_users (name, email, role) values
+insert into public.usuarios_app (nome, email, perfil) values
   ('Jose Manuel', 'jmolinas86@gmail.com', 'admin')
 on conflict (email) do nothing;
 
-insert into public.suppliers (name, contact_name, email, notes) values
+insert into public.fornecedores (nome, nome_contato, email, observacoes) values
   ('BestMalz Brasil', 'Comercial', null, 'Fornecedor simples para maltes'),
   ('YCH Hops Brasil', 'Comercial', null, 'Fornecedor simples para lupulos'),
   ('Fermentis', 'Comercial', null, 'Fornecedor simples para leveduras')
-on conflict (name) do nothing;
+on conflict (nome) do nothing;
 
-insert into public.items (name, type, category, unit_code, minimum_stock, reference_cost) values
-  ('Malte Pilsen', 'ingredient', 'Malte', 'kg', 10.000, 7.2000),
-  ('Lupulo Citra', 'ingredient', 'Lupulo', 'g', 500.000, 0.1550),
-  ('Levedura US-05', 'ingredient', 'Levedura', 'pct', 2.000, 28.0000),
-  ('Garrafa 600 ml', 'packaging', 'Embalagem', 'un', 100.000, 1.1000)
-on conflict (name, type) do nothing;
+insert into public.itens (nome, tipo, categoria, codigo_unidade, estoque_minimo, custo_referencia) values
+  ('Malte Pilsen', 'ingrediente', 'Malte', 'kg', 10.000, 7.2000),
+  ('Lupulo Citra', 'ingrediente', 'Lupulo', 'g', 500.000, 0.1550),
+  ('Levedura US-05', 'ingrediente', 'Levedura', 'pct', 2.000, 28.0000),
+  ('Garrafa 600 ml', 'embalagem', 'Embalagem', 'un', 100.000, 1.1000)
+on conflict (nome, tipo) do nothing;
 
-insert into public.item_lots (item_id, supplier_id, lot_code, expires_on, unit_cost, received_at)
-select i.id, s.id, x.lot_code, x.expires_on::date, x.unit_cost, current_date
+insert into public.lotes_itens (id_item, id_fornecedor, codigo_lote, validade, custo_unitario, recebido_em)
+select i.id, f.id, x.codigo_lote, x.validade::date, x.custo_unitario, current_date
 from (
   values
-    ('Malte Pilsen', 'ingredient'::public.item_type, 'PIL-2406', '2026-06-30', 7.2000, 'BestMalz Brasil'),
-    ('Lupulo Citra', 'ingredient'::public.item_type, 'CIT-2407', '2026-08-15', 0.1550, 'YCH Hops Brasil'),
-    ('Levedura US-05', 'ingredient'::public.item_type, 'LEV-2405', '2026-12-12', 28.0000, 'Fermentis'),
-    ('Garrafa 600 ml', 'packaging'::public.item_type, 'GAR-2404', null, 1.1000, null)
-) as x(item_name, item_type, lot_code, expires_on, unit_cost, supplier_name)
-join public.items i on i.name = x.item_name and i.type = x.item_type
-left join public.suppliers s on s.name = x.supplier_name
-on conflict (item_id, lot_code) do nothing;
+    ('Malte Pilsen', 'ingrediente'::public.tipo_item, 'PIL-2406', '2026-06-30', 7.2000, 'BestMalz Brasil'),
+    ('Lupulo Citra', 'ingrediente'::public.tipo_item, 'CIT-2407', '2026-08-15', 0.1550, 'YCH Hops Brasil'),
+    ('Levedura US-05', 'ingrediente'::public.tipo_item, 'LEV-2405', '2026-12-12', 28.0000, 'Fermentis'),
+    ('Garrafa 600 ml', 'embalagem'::public.tipo_item, 'GAR-2404', null, 1.1000, null)
+) as x(nome_item, tipo_item, codigo_lote, validade, custo_unitario, nome_fornecedor)
+join public.itens i on i.nome = x.nome_item and i.tipo = x.tipo_item
+left join public.fornecedores f on f.nome = x.nome_fornecedor
+on conflict (id_item, codigo_lote) do nothing;
 
-insert into public.stock_movements (item_id, lot_id, movement_type, quantity, unit_cost, notes)
-select i.id, l.id, 'purchase', x.quantity, l.unit_cost, 'Estoque inicial de demonstracao'
+insert into public.movimentacoes_estoque (id_item, id_lote, tipo_movimentacao, quantidade, custo_unitario, observacoes)
+select i.id, l.id, 'compra', x.quantidade, l.custo_unitario, 'Estoque inicial de demonstracao'
 from (
   values
-    ('Malte Pilsen', 'ingredient'::public.item_type, 'PIL-2406', 25.000),
-    ('Lupulo Citra', 'ingredient'::public.item_type, 'CIT-2407', 1000.000),
-    ('Levedura US-05', 'ingredient'::public.item_type, 'LEV-2405', 5.000),
-    ('Garrafa 600 ml', 'packaging'::public.item_type, 'GAR-2404', 120.000)
-) as x(item_name, item_type, lot_code, quantity)
-join public.items i on i.name = x.item_name and i.type = x.item_type
-join public.item_lots l on l.item_id = i.id and l.lot_code = x.lot_code
+    ('Malte Pilsen', 'ingrediente'::public.tipo_item, 'PIL-2406', 25.000),
+    ('Lupulo Citra', 'ingrediente'::public.tipo_item, 'CIT-2407', 1000.000),
+    ('Levedura US-05', 'ingrediente'::public.tipo_item, 'LEV-2405', 5.000),
+    ('Garrafa 600 ml', 'embalagem'::public.tipo_item, 'GAR-2404', 120.000)
+) as x(nome_item, tipo_item, codigo_lote, quantidade)
+join public.itens i on i.nome = x.nome_item and i.tipo = x.tipo_item
+join public.lotes_itens l on l.id_item = i.id and l.codigo_lote = x.codigo_lote
 where not exists (
   select 1
-  from public.stock_movements sm
-  where sm.lot_id = l.id
-    and sm.movement_type = 'purchase'
-    and sm.notes = 'Estoque inicial de demonstracao'
+  from public.movimentacoes_estoque me
+  where me.id_lote = l.id
+    and me.tipo_movimentacao = 'compra'
+    and me.observacoes = 'Estoque inicial de demonstracao'
 );
 
-insert into public.recipes (name, style, target_volume_liters, notes) values
+insert into public.receitas (nome, estilo, volume_previsto_litros, observacoes) values
   ('IPA Citra 20 L', 'American IPA', 20.000, 'Receita demonstrativa para validar estoque, brassagem e custo real')
-on conflict (name) do nothing;
+on conflict (nome) do nothing;
 
-insert into public.recipe_versions (recipe_id, version_number, target_og, target_fg, target_abv, target_ibu, notes)
+insert into public.versoes_receitas (id_receita, numero_versao, og_previsto, fg_previsto, abv_previsto, ibu_previsto, observacoes)
 select r.id, 1, 1.060, 1.012, 6.30, 60.00, 'Versao inicial demonstrativa'
-from public.recipes r
-where r.name = 'IPA Citra 20 L'
-on conflict (recipe_id, version_number) do nothing;
+from public.receitas r
+where r.nome = 'IPA Citra 20 L'
+on conflict (id_receita, numero_versao) do nothing;
 
-insert into public.recipe_inputs (recipe_version_id, item_id, stage, planned_quantity, sort_order)
-select rv.id, i.id, x.stage, x.planned_quantity, x.sort_order
+insert into public.insumos_receita (id_versao_receita, id_item, etapa, quantidade_prevista, ordem)
+select vr.id, i.id, x.etapa, x.quantidade_prevista, x.ordem
 from (
   values
-    ('Malte Pilsen', 'ingredient'::public.item_type, 'mash'::public.batch_stage, 5.000, 10),
-    ('Lupulo Citra', 'ingredient'::public.item_type, 'boil'::public.batch_stage, 100.000, 20),
-    ('Levedura US-05', 'ingredient'::public.item_type, 'fermentation'::public.batch_stage, 1.000, 30)
-) as x(item_name, item_type, stage, planned_quantity, sort_order)
-join public.recipes r on r.name = 'IPA Citra 20 L'
-join public.recipe_versions rv on rv.recipe_id = r.id and rv.version_number = 1
-join public.items i on i.name = x.item_name and i.type = x.item_type
-on conflict (recipe_version_id, item_id, stage, sort_order) do nothing;
+    ('Malte Pilsen', 'ingrediente'::public.tipo_item, 'mostura'::public.etapa_brassagem, 5.000, 10),
+    ('Lupulo Citra', 'ingrediente'::public.tipo_item, 'fervura'::public.etapa_brassagem, 100.000, 20),
+    ('Levedura US-05', 'ingrediente'::public.tipo_item, 'fermentacao'::public.etapa_brassagem, 1.000, 30)
+) as x(nome_item, tipo_item, etapa, quantidade_prevista, ordem)
+join public.receitas r on r.nome = 'IPA Citra 20 L'
+join public.versoes_receitas vr on vr.id_receita = r.id and vr.numero_versao = 1
+join public.itens i on i.nome = x.nome_item and i.tipo = x.tipo_item
+on conflict (id_versao_receita, id_item, etapa, ordem) do nothing;
 
-insert into public.brew_batches (
-  batch_number,
-  recipe_version_id,
+insert into public.brassagens (
+  numero_brassagem,
+  id_versao_receita,
   status,
-  current_stage,
-  planned_volume_liters,
-  started_at,
-  notes
+  etapa_atual,
+  volume_previsto_litros,
+  iniciada_em,
+  observacoes
 )
 select
   'BR-0001',
-  rv.id,
-  'in_progress',
-  'fermentation',
+  vr.id,
+  'em_andamento',
+  'fermentacao',
   20.000,
   now(),
   'Brassagem demonstrativa ainda sem desconto de estoque. O desconto ocorre ao finalizar.'
-from public.recipes r
-join public.recipe_versions rv on rv.recipe_id = r.id and rv.version_number = 1
-where r.name = 'IPA Citra 20 L'
-on conflict (batch_number) do nothing;
+from public.receitas r
+join public.versoes_receitas vr on vr.id_receita = r.id and vr.numero_versao = 1
+where r.nome = 'IPA Citra 20 L'
+on conflict (numero_brassagem) do nothing;
