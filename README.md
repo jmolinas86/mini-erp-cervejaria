@@ -14,8 +14,11 @@ Mini ERP para cervejaria caseira, sem modulo fiscal, com foco em estoque, receit
 - `outputs/mini_erp_escopo/mini_erp_escopo_cervejaria_fase3.xlsx`: escopo aprovado e acompanhamento por fases atualizado.
 - `docs/fase-1-arquitetura.md`: decisoes iniciais de arquitetura, stack, ambientes e padrao de implementacao.
 - `docs/fase-2-modelo-dados.md`: modelo de dados inicial e regras de estoque/custo.
+- `docs/fase-3-base-sistema.md`: status da base web e proximos passos da Fase 3.
+- `docs/supabase-conexao.md`: passo a passo para executar e validar o banco no Supabase.
 - `database/migrations/001_initial_schema.sql`: primeira versao do schema PostgreSQL.
 - `database/seed/001_seed_demo.sql`: dados de exemplo para validar o modelo.
+- `database/verification/001_check_schema.sql`: consultas para validar se o schema e o seed foram criados corretamente.
 
 ## Como rodar localmente
 

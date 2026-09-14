@@ -277,7 +277,8 @@ create trigger set_brew_batch_consumptions_updated_at
 before update on public.brew_batch_consumptions
 for each row execute function public.set_updated_at();
 
-create or replace view public.v_stock_balances as
+create or replace view public.v_stock_balances
+with (security_invoker = true) as
 select
   i.id as item_id,
   i.name as item_name,
@@ -318,7 +319,8 @@ left join public.item_lots l on l.item_id = i.id
 left join public.stock_movements sm on sm.item_id = i.id and sm.lot_id is not distinct from l.id
 group by i.id, i.name, i.type, i.category, i.unit_code, i.minimum_stock, l.id, l.lot_code, l.expires_on, l.unit_cost;
 
-create or replace view public.v_brew_batch_costs as
+create or replace view public.v_brew_batch_costs
+with (security_invoker = true) as
 select
   b.id as brew_batch_id,
   b.batch_number,
@@ -351,3 +353,116 @@ group by b.id, b.batch_number, b.status, b.planned_volume_liters, b.final_volume
 
 comment on table public.brew_batches is 'Finished product is tracked as final_volume_liters on the batch, not as separate inventory in the MVP.';
 comment on column public.brew_batches.stock_posted_at is 'Stock deduction is posted only when the brew batch is finalized.';
+
+-- Supabase access model for the single-user MVP.
+-- The frontend uses the publishable key and logged-in users use the authenticated role.
+-- Anonymous users receive no table policy here.
+
+alter table public.app_users enable row level security;
+alter table public.suppliers enable row level security;
+alter table public.units enable row level security;
+alter table public.items enable row level security;
+alter table public.item_lots enable row level security;
+alter table public.stock_movements enable row level security;
+alter table public.recipes enable row level security;
+alter table public.recipe_versions enable row level security;
+alter table public.recipe_inputs enable row level security;
+alter table public.brew_batches enable row level security;
+alter table public.brew_batch_consumptions enable row level security;
+alter table public.brew_batch_extra_costs enable row level security;
+alter table public.brew_batch_events enable row level security;
+
+grant usage on schema public to authenticated;
+grant usage on type public.item_type to authenticated;
+grant usage on type public.stock_movement_type to authenticated;
+grant usage on type public.brew_batch_status to authenticated;
+grant usage on type public.batch_stage to authenticated;
+grant usage on type public.batch_extra_cost_type to authenticated;
+
+grant select, insert, update on public.app_users to authenticated;
+grant select on public.units to authenticated;
+grant select, insert, update, delete on public.suppliers to authenticated;
+grant select, insert, update, delete on public.items to authenticated;
+grant select, insert, update, delete on public.item_lots to authenticated;
+grant select, insert, update, delete on public.stock_movements to authenticated;
+grant select, insert, update, delete on public.recipes to authenticated;
+grant select, insert, update, delete on public.recipe_versions to authenticated;
+grant select, insert, update, delete on public.recipe_inputs to authenticated;
+grant select, insert, update, delete on public.brew_batches to authenticated;
+grant select, insert, update, delete on public.brew_batch_consumptions to authenticated;
+grant select, insert, update, delete on public.brew_batch_extra_costs to authenticated;
+grant select, insert, update, delete on public.brew_batch_events to authenticated;
+grant select on public.v_stock_balances to authenticated;
+grant select on public.v_brew_batch_costs to authenticated;
+
+create policy app_users_select_own on public.app_users
+for select to authenticated
+using (auth_user_id = (select auth.uid()));
+
+create policy app_users_insert_own on public.app_users
+for insert to authenticated
+with check (auth_user_id = (select auth.uid()));
+
+create policy app_users_update_own on public.app_users
+for update to authenticated
+using (auth_user_id = (select auth.uid()))
+with check (auth_user_id = (select auth.uid()));
+
+create policy units_read_authenticated on public.units
+for select to authenticated
+using ((select auth.uid()) is not null);
+
+create policy suppliers_manage_authenticated on public.suppliers
+for all to authenticated
+using ((select auth.uid()) is not null)
+with check ((select auth.uid()) is not null);
+
+create policy items_manage_authenticated on public.items
+for all to authenticated
+using ((select auth.uid()) is not null)
+with check ((select auth.uid()) is not null);
+
+create policy item_lots_manage_authenticated on public.item_lots
+for all to authenticated
+using ((select auth.uid()) is not null)
+with check ((select auth.uid()) is not null);
+
+create policy stock_movements_manage_authenticated on public.stock_movements
+for all to authenticated
+using ((select auth.uid()) is not null)
+with check ((select auth.uid()) is not null);
+
+create policy recipes_manage_authenticated on public.recipes
+for all to authenticated
+using ((select auth.uid()) is not null)
+with check ((select auth.uid()) is not null);
+
+create policy recipe_versions_manage_authenticated on public.recipe_versions
+for all to authenticated
+using ((select auth.uid()) is not null)
+with check ((select auth.uid()) is not null);
+
+create policy recipe_inputs_manage_authenticated on public.recipe_inputs
+for all to authenticated
+using ((select auth.uid()) is not null)
+with check ((select auth.uid()) is not null);
+
+create policy brew_batches_manage_authenticated on public.brew_batches
+for all to authenticated
+using ((select auth.uid()) is not null)
+with check ((select auth.uid()) is not null);
+
+create policy brew_batch_consumptions_manage_authenticated on public.brew_batch_consumptions
+for all to authenticated
+using ((select auth.uid()) is not null)
+with check ((select auth.uid()) is not null);
+
+create policy brew_batch_extra_costs_manage_authenticated on public.brew_batch_extra_costs
+for all to authenticated
+using ((select auth.uid()) is not null)
+with check ((select auth.uid()) is not null);
+
+create policy brew_batch_events_manage_authenticated on public.brew_batch_events
+for all to authenticated
+using ((select auth.uid()) is not null)
+with check ((select auth.uid()) is not null);
