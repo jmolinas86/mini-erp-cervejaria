@@ -90,11 +90,10 @@ Variaveis previstas:
 
 ```text
 NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 ```
 
-A chave `SUPABASE_SERVICE_ROLE_KEY` deve ser usada apenas em rotinas seguras no servidor, nunca no navegador.
+No MVP, o frontend deve usar apenas a chave publica/publishable do Supabase. Chaves `service_role`, `secret key` ou equivalentes nao devem ser usadas no navegador.
 
 ## Fluxo de Git
 

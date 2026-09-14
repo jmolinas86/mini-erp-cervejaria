@@ -1,6 +1,10 @@
 # Dependencies
 node_modules/
 
+# Next.js build output
+.next/
+out/
+
 # Environment and secrets
 .env
 .env.*
@@ -10,6 +14,7 @@ node_modules/
 *.log
 .DS_Store
 Thumbs.db
+tsconfig.tsbuildinfo
 
 # Excel temporary lock files
 ~$*

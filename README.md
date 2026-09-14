@@ -17,6 +17,29 @@ Mini ERP para cervejaria caseira, sem modulo fiscal, com foco em estoque, receit
 - `database/migrations/001_initial_schema.sql`: primeira versao do schema PostgreSQL.
 - `database/seed/001_seed_demo.sql`: dados de exemplo para validar o modelo.
 
+## Como rodar localmente
+
+1. Instalar as dependencias:
+
+```bash
+pnpm install
+```
+
+2. Criar o arquivo `.env.local` com as variaveis do Supabase:
+
+```text
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+```
+
+3. Rodar o app:
+
+```bash
+pnpm dev
+```
+
+O arquivo `.env.local` nao deve ser enviado ao GitHub.
+
 ## Repositorio
 
 Repositorio GitHub: https://github.com/jmolinas86/mini-erp-cervejaria
@@ -24,6 +47,8 @@ Repositorio GitHub: https://github.com/jmolinas86/mini-erp-cervejaria
 ## Regras do projeto
 
 - Nao subir arquivos `.env` nem chaves do Supabase.
+- Usar `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` no navegador.
+- Nao usar `service_role` ou `secret key` no frontend.
 - Comecar pelo MVP aprovado na planilha.
 - Manter vendas e modulo fiscal fora do primeiro ciclo.
 - Priorizar uso no celular para operacoes de estoque e brassagem.
