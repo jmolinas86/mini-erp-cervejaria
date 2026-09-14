@@ -10,10 +10,10 @@ export function SupabaseStatus() {
       <div className="supabase-card-content">
         <div>
           <p className="supabase-kicker">Supabase</p>
-          <h2 className="supabase-title">Conexão preparada</h2>
+          <h2 className="supabase-title">Conexão ativa</h2>
           <p className="supabase-text">
-            As variáveis locais do Supabase foram configuradas. O próximo passo
-            é executar o SQL da Fase 2 no banco e validar a primeira consulta.
+            O app está configurado para usar Supabase Auth, sessão SSR por
+            cookies e consultas autenticadas no banco PostgreSQL.
           </p>
         </div>
 

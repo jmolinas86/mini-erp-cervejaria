@@ -7,7 +7,10 @@ Mini ERP para cervejaria caseira, sem modulo fiscal, com foco em estoque, receit
 - Escopo aprovado.
 - Fase 2 concluida.
 - Supabase criado.
+- Banco inicial executado no Supabase.
 - Fase atual: Fase 3 - Base do sistema.
+- Auth por email e senha configurado com sessões SSR e rotas protegidas.
+- Painel inicial autenticado lendo estoque e brassagens do Supabase.
 
 ## Documentos principais
 
@@ -17,6 +20,7 @@ Mini ERP para cervejaria caseira, sem modulo fiscal, com foco em estoque, receit
 - `docs/fase-3-base-sistema.md`: status da base web e proximos passos da Fase 3.
 - `docs/supabase-conexao.md`: passo a passo para executar e validar o banco no Supabase.
 - `database/migrations/001_initial_schema.sql`: primeira versao do schema PostgreSQL.
+- `database/migrations/002_supabase_advisor_fixes.sql`: ajustes recomendados pelo Supabase Advisor.
 - `database/seed/001_seed_demo.sql`: dados de exemplo para validar o modelo.
 - `database/verification/001_check_schema.sql`: consultas para validar se o schema e o seed foram criados corretamente.
 
@@ -42,6 +46,17 @@ pnpm dev
 ```
 
 O arquivo `.env.local` nao deve ser enviado ao GitHub.
+
+## Autenticacao
+
+- `/login` permite entrar ou criar uma conta com email e senha.
+- `/` e as demais rotas do app exigem uma sessão válida.
+- O Proxy renova os cookies de autenticação e valida o JWT com `getClaims()`.
+- `POST /auth/signout` encerra a sessão e retorna ao login.
+- A home autenticada consulta `vw_saldos_estoque` e `brassagens`.
+
+Se a confirmação de email estiver habilitada no Supabase, o usuário precisa
+confirmar o cadastro antes do primeiro acesso.
 
 ## Repositorio
 

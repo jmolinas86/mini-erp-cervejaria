@@ -12,6 +12,10 @@ Criar a base web do Mini ERP e conectar o app ao Supabase.
 - Variaveis locais configuradas.
 - Build validado.
 - Banco executado e validado no Supabase.
+- Login por email e senha implementado.
+- Rotas protegidas com `proxy.ts`.
+- Consulta autenticada ao Supabase validada.
+- Painel inicial pós-login criado.
 
 ## Entregas iniciais
 
@@ -26,6 +30,10 @@ Criar a base web do Mini ERP e conectar o app ao Supabase.
 | Execucao no Supabase | Concluida |
 | Ajustes do Supabase Advisor | Concluidos |
 | Tradução de tabelas e colunas | Concluida |
+| Login e cadastro | Implementados |
+| Proteção de rotas | Validada |
+| Consulta real autenticada | Validada |
+| Painel inicial pós-login | Criado |
 
 ## Proximo passo
 
@@ -38,7 +46,9 @@ Banco inicial executado no Supabase:
 5. `database/seed/001_seed_demo.sql`
 6. `database/verification/001_check_schema.sql`
 
-Proxima entrega da Fase 3: validar uma consulta real do app usando usuario autenticado e iniciar o login.
+Proxima entrega da Fase 3: teste manual do primeiro usuario real no navegador e fechamento da fase.
+
+Como a confirmação de email esta habilitada no Supabase, o cadastro cria o usuario mas exige confirmação por email antes do primeiro login. Para teste automatico, a criação do usuario técnico funcionou ate essa barreira de confirmação.
 
 ## Tradução do banco
 
@@ -54,3 +64,22 @@ Foram traduzidos:
 - constraints, indices, triggers e policies.
 
 Os nomes continuam sem acentos para evitar problemas em SQL, APIs e TypeScript.
+
+## Login e painel inicial
+
+A base web agora tem:
+
+- `/login` para entrar ou criar conta com email e senha;
+- `/auth/signout` para sair;
+- `proxy.ts` protegendo a home e demais rotas privadas;
+- home autenticada consultando `vw_saldos_estoque` e `brassagens`;
+- cards de resumo para itens com saldo, estoque critico e brassagens abertas;
+- tabela inicial de saldos por lote;
+- lista de brassagens recentes.
+
+Validacoes executadas:
+
+- `pnpm typecheck`;
+- `pnpm build`;
+- acesso sem sessão redireciona para `/login?next=%2F`;
+- consulta com papel `authenticated` e `auth.uid()` simulado retorna saldos e brassagens no Supabase.
