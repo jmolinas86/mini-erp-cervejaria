@@ -5,11 +5,13 @@ Mini ERP para cervejaria caseira, sem modulo fiscal, com foco em estoque, receit
 ## Status
 
 - Escopo aprovado.
-- Fase atual: Fase 2 - Modelo de dados.
+- Fase 2 concluida.
+- Supabase criado.
+- Fase atual: Fase 3 - Base do sistema.
 
 ## Documentos principais
 
-- `outputs/mini_erp_escopo/mini_erp_escopo_cervejaria.xlsx`: escopo aprovado e acompanhamento por fases.
+- `outputs/mini_erp_escopo/mini_erp_escopo_cervejaria_fase3.xlsx`: escopo aprovado e acompanhamento por fases atualizado.
 - `docs/fase-1-arquitetura.md`: decisoes iniciais de arquitetura, stack, ambientes e padrao de implementacao.
 - `docs/fase-2-modelo-dados.md`: modelo de dados inicial e regras de estoque/custo.
 - `database/migrations/001_initial_schema.sql`: primeira versao do schema PostgreSQL.

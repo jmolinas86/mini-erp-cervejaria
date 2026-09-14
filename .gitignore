@@ -24,6 +24,8 @@ outputs/**/*.backup_*.xlsx
 scripts/build_mini_erp_scope.mjs
 scripts/read_scope_workbook.mjs
 scripts/render_scope_current.mjs
+scripts/render_fase2_current.mjs
 scripts/add_fases_sheet.mjs
 scripts/update_fase1_status.mjs
 scripts/update_fase2_status.mjs
+scripts/update_fase3_status.mjs

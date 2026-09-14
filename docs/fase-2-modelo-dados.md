@@ -1,5 +1,11 @@
 # Fase 2 - Modelo de Dados
 
+## Status
+
+Fase 2 concluida em 14/09/2026.
+
+O projeto Supabase ja foi criado. A execucao e validacao do SQL no banco ficam como primeiro passo pratico da Fase 3, junto com a base do sistema web.
+
 ## Objetivo
 
 Transformar o escopo aprovado em uma primeira versao revisavel do banco PostgreSQL.
@@ -86,6 +92,7 @@ Na fase do app, a acao "Finalizar brassagem" devera:
 - Confirmar se o campo `reference_cost` em `items` sera usado como custo previsto.
 - Confirmar se perdas de estoque fora da brassagem usam `stock_movements.loss`.
 - Confirmar se embalagem sera registrada como item de estoque e tambem como custo de envase.
+- Executar e validar o SQL inicial no Supabase criado.
 
 ## Criterio de conclusao da Fase 2
 
