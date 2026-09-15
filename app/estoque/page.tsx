@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
 import { createClient } from "@/lib/supabase/server";
+import { StockInventory } from "@/components/stock-inventory";
 import { editarLote, registrarEntrada, registrarMovimentacao } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -23,7 +24,7 @@ type Saldo = {
 type Item = { id: string; nome: string; codigo_item: string; codigo_grupo: string; codigo_unidade: string };
 type Fornecedor = { id: string; nome: string };
 type Unidade = { codigo: string; nome: string; tipo: string; unidade_base: string; fator_para_base: number | string };
-type Lote = { id: string; id_item: string; codigo_item: string; codigo_grupo: string; codigo_lote: string; custo_unitario: number | string; validade: string | null };
+type Lote = { id: string; id_item: string; codigo_item: string; codigo_grupo: string; id_fornecedor: string | null; codigo_lote: string; custo_unitario: number | string; validade: string | null };
 type Movimento = { id: string; id_item: string; id_lote: string | null; codigo_item: string; codigo_grupo: string; tipo_movimentacao: string; quantidade: number | string; custo_unitario: number | string | null; ocorrido_em: string; observacoes: string | null };
 
 const tipoLabel: Record<string, string> = {
@@ -58,7 +59,7 @@ export default async function EstoquePage({ searchParams }: { searchParams: Prom
     supabase.from("vw_saldos_estoque").select("id_item,nome_item,tipo_item,categoria,codigo_unidade,id_lote,codigo_lote,validade,custo_unitario,quantidade_saldo,estoque_minimo,status_estoque").order("status_estoque").order("nome_item"),
     supabase.from("itens").select("id,nome,codigo_item,codigo_grupo,codigo_unidade").eq("ativo", true).order("nome"),
     supabase.from("fornecedores").select("id,nome").eq("ativo", true).order("nome"),
-    supabase.from("lotes_itens").select("id,id_item,codigo_item,codigo_grupo,codigo_lote,custo_unitario,validade").order("codigo_lote"),
+    supabase.from("lotes_itens").select("id,id_item,codigo_item,codigo_grupo,id_fornecedor,codigo_lote,custo_unitario,validade").order("codigo_lote"),
     supabase.from("movimentacoes_estoque").select("id,id_item,id_lote,codigo_item,codigo_grupo,tipo_movimentacao,quantidade,custo_unitario,ocorrido_em,observacoes").order("ocorrido_em", { ascending: false }).limit(20),
     supabase.from("unidades").select("codigo,nome,tipo,unidade_base,fator_para_base").order("tipo").order("codigo")
   ]);
@@ -74,6 +75,8 @@ export default async function EstoquePage({ searchParams }: { searchParams: Prom
   const itensCriticos = listaSaldos.filter((saldo) => saldo.status_estoque !== "ok").length;
   const valorEstoque = listaSaldos.reduce((total, saldo) => total + numero(saldo.quantidade_saldo) * numero(saldo.custo_unitario), 0);
   const nomeItem = new Map(listaItens.map((item) => [item.id, item.nome]));
+
+  return <AppShell active="estoque" userEmail={email}><StockInventory email={email} params={params} saldos={listaSaldos} itens={listaItens} fornecedores={listaFornecedores} lotes={listaLotes} movimentos={listaMovimentos} unidades={listaUnidades} /></AppShell>;
 
   return (
     <AppShell active="estoque" userEmail={email}>
