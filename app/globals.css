@@ -1295,6 +1295,30 @@ td,
   line-height: 1;
 }
 
+.stock-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stock-row-actions .row-details summary {
+  color: #087c58;
+  font-size: 0.72rem;
+}
+
+.stock-row-actions .row-details {
+  position: relative;
+}
+
+.stock-row-actions .details-form {
+  position: absolute;
+  z-index: 5;
+  right: 0;
+  min-width: 300px;
+  background: #ffffff;
+  box-shadow: 0 16px 34px rgba(27, 67, 54, 0.16);
+}
+
 .stock-detail-panel {
   position: sticky;
   top: 16px;
