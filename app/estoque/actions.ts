@@ -116,7 +116,7 @@ export async function registrarEntrada(formData: FormData) {
     feedback("Preencha item, lote, quantidade, custo e datas válidas.", true);
   }
 
-  const { data: item, error: erroItem } = await supabase.from("itens").select("codigo_unidade").eq("id", idItem).maybeSingle();
+  const { data: item, error: erroItem } = await supabase.from("itens").select("codigo_unidade,codigo_item,codigo_grupo").eq("id", idItem).maybeSingle();
   if (erroItem || !item) feedback("Item não encontrado.", true);
   const conversao = await converterUnidade(supabase, item.codigo_unidade, codigoUnidadeEntrada, quantidadeInformada, custoInformado);
   if (!conversao) feedback("A unidade informada não é compatível com a unidade-base do item.", true);
@@ -127,6 +127,8 @@ export async function registrarEntrada(formData: FormData) {
     .from("lotes_itens")
     .insert({
       id_item: idItem,
+      codigo_item: item.codigo_item,
+      codigo_grupo: item.codigo_grupo,
       id_fornecedor: idFornecedor || null,
       codigo_lote: codigoLote,
       validade: validade || null,
@@ -141,6 +143,8 @@ export async function registrarEntrada(formData: FormData) {
 
   const { error: erroMovimento } = await supabase.from("movimentacoes_estoque").insert({
     id_item: idItem,
+    codigo_item: item.codigo_item,
+    codigo_grupo: item.codigo_grupo,
     id_lote: lote.id,
     tipo_movimentacao: "compra",
     quantidade: conversao.quantidade,
@@ -174,12 +178,12 @@ export async function registrarMovimentacao(formData: FormData) {
 
   const { data: lote, error: erroLote } = await supabase
     .from("lotes_itens")
-    .select("id,id_item,custo_unitario")
+    .select("id,id_item,codigo_item,codigo_grupo,custo_unitario")
     .eq("id", idLote)
     .maybeSingle();
   if (erroLote || !lote) feedback("Lote não encontrado.", true);
 
-  const { data: item, error: erroItem } = await supabase.from("itens").select("codigo_unidade").eq("id", lote.id_item).maybeSingle();
+  const { data: item, error: erroItem } = await supabase.from("itens").select("codigo_unidade,codigo_item,codigo_grupo").eq("id", lote.id_item).maybeSingle();
   if (erroItem || !item) feedback("Item do lote não encontrado.", true);
   const conversao = await converterUnidade(supabase, item.codigo_unidade, codigoUnidadeEntrada, quantidadeInformada, custoUnitario);
   if (!conversao) feedback("A unidade informada não é compatível com a unidade-base do lote.", true);
@@ -196,6 +200,8 @@ export async function registrarMovimentacao(formData: FormData) {
 
   const { error } = await supabase.from("movimentacoes_estoque").insert({
     id_item: lote.id_item,
+    codigo_item: item.codigo_item,
+    codigo_grupo: item.codigo_grupo,
     id_lote: lote.id,
     tipo_movimentacao: tipo,
     quantidade: conversao.quantidade,

@@ -33,24 +33,29 @@ async function autenticado() {
   return supabase;
 }
 
-function dadosItem(formData: FormData) {
+async function dadosItem(supabase: Awaited<ReturnType<typeof createClient>>, formData: FormData) {
   const nome = texto(formData, "nome");
   const tipo = texto(formData, "tipo");
-  const categoria = texto(formData, "categoria");
+  const codigoItem = texto(formData, "codigo_item").toUpperCase();
+  const codigoGrupo = texto(formData, "codigo_grupo").toUpperCase();
   const codigoUnidade = texto(formData, "codigo_unidade");
   const estoqueMinimo = numero(formData, "estoque_minimo");
   const custoReferencia = numero(formData, "custo_referencia", true);
 
-  if (!nome || !tiposPermitidos.has(tipo) || !categoria || !codigoUnidade || estoqueMinimo === null || (texto(formData, "custo_referencia") && custoReferencia === null)) {
-    feedback("Preencha nome, tipo, categoria, unidade e valores válidos.", true);
+  if (!nome || !tiposPermitidos.has(tipo) || !/^[A-Z0-9][A-Z0-9_-]{2,30}$/.test(codigoItem) || !/^[A-Z0-9][A-Z0-9_-]{1,20}$/.test(codigoGrupo) || !codigoUnidade || estoqueMinimo === null || (texto(formData, "custo_referencia") && custoReferencia === null)) {
+    feedback("Preencha nome, código do item, grupo, unidade e valores válidos.", true);
   }
 
-  return { nome, tipo, categoria, codigo_unidade: codigoUnidade, estoque_minimo: estoqueMinimo, custo_referencia: custoReferencia, observacoes: texto(formData, "observacoes") || null };
+  const { data: grupo, error: erroGrupo } = await supabase.from("grupos_itens").select("codigo,nome,codigo_categoria").eq("codigo", codigoGrupo).eq("ativo", true).maybeSingle();
+  const categoriaEsperada = tipo === "ingrediente" ? "ING" : tipo === "embalagem" ? "EMB" : "PA";
+  if (erroGrupo || !grupo || grupo.codigo_categoria !== categoriaEsperada) feedback("Selecione um grupo compatível com o tipo do item.", true);
+
+  return { nome, tipo, codigo_item: codigoItem, codigo_grupo: codigoGrupo, categoria: grupo.nome, codigo_unidade: codigoUnidade, estoque_minimo: estoqueMinimo, custo_referencia: custoReferencia, observacoes: texto(formData, "observacoes") || null };
 }
 
 export async function criarItem(formData: FormData) {
   const supabase = await autenticado();
-  const { error } = await supabase.from("itens").insert(dadosItem(formData));
+  const { error } = await supabase.from("itens").insert(await dadosItem(supabase, formData));
   if (error) feedback("Não foi possível criar o item. Confira se nome, tipo e unidade estão corretos.", true);
   feedback("Item criado com sucesso.");
 }
@@ -59,8 +64,13 @@ export async function editarItem(formData: FormData) {
   const id = texto(formData, "id");
   if (!isUuid(id)) feedback("Item inválido.", true);
   const supabase = await autenticado();
-  const { error } = await supabase.from("itens").update(dadosItem(formData)).eq("id", id);
+  const dados = await dadosItem(supabase, formData);
+  const { data: atual, error: erroAtual } = await supabase.from("itens").select("codigo_item").eq("id", id).maybeSingle();
+  if (erroAtual || !atual || atual.codigo_item !== dados.codigo_item) feedback("O código do item é uma referência fixa e não pode ser alterado.", true);
+  const { error } = await supabase.from("itens").update(dados).eq("id", id);
   if (error) feedback("Não foi possível atualizar o item. Confira os dados informados.", true);
+  await supabase.from("lotes_itens").update({ codigo_grupo: dados.codigo_grupo }).eq("id_item", id);
+  await supabase.from("movimentacoes_estoque").update({ codigo_grupo: dados.codigo_grupo }).eq("id_item", id);
   feedback("Item atualizado com sucesso.");
 }
 

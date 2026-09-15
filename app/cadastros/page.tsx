@@ -15,11 +15,12 @@ export default async function CadastrosPage() {
 
   const email = typeof data.claims.email === "string" ? data.claims.email : undefined;
 
-  const [{ count: totalItens }, { count: totalFornecedores }, { count: totalUnidades }] =
+  const [{ count: totalItens }, { count: totalFornecedores }, { count: totalUnidades }, { count: totalGrupos }] =
     await Promise.all([
       supabase.from("itens").select("id", { count: "exact", head: true }),
       supabase.from("fornecedores").select("id", { count: "exact", head: true }),
-      supabase.from("unidades").select("codigo", { count: "exact", head: true })
+      supabase.from("unidades").select("codigo", { count: "exact", head: true }),
+      supabase.from("grupos_itens").select("codigo", { count: "exact", head: true })
     ]);
 
   return (
@@ -58,6 +59,12 @@ export default async function CadastrosPage() {
             <p className="card-title">{totalUnidades ?? 0} disponíveis</p>
             <p className="card-text">Unidades padrão do ERP, prontas para uso nos itens e receitas.</p>
             <span className="card-link">Ver conversões →</span>
+          </Link>
+          <Link className="dark-card link-card" href="/cadastros/grupos">
+            <p className="card-label">Classificação</p>
+            <p className="card-title">{totalGrupos ?? 0} grupos</p>
+            <p className="card-text">Categorias e grupos usados como referência dos códigos de item.</p>
+            <span className="card-link">Gerenciar grupos →</span>
           </Link>
         </div>
 
