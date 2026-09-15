@@ -6,6 +6,7 @@ O módulo de estoque permite controlar a posição física por lote e manter o h
 
 - entrada de compra com criação de lote;
 - fornecedor, validade, data de recebimento e custo unitário;
+- unidade informada na compra com conversão automática para a unidade-base;
 - saída manual, perda, entrada manual e ajustes;
 - validação de saldo antes de qualquer saída;
 - saldo e status calculados pela view `vw_saldos_estoque`;
@@ -25,6 +26,7 @@ As operações exigem autenticação, validam os dados no servidor e registram o
 - saídas não ultrapassam o saldo do lote;
 - estoque mínimo e itens vazios destacados;
 - filtros por item/lote e status;
+- conversão de massa (g/kg) e volume (ml/l), com custo normalizado;
 - layout responsivo alinhado às telas de referência do BrewerPro.
 
 O próximo passo é a Fase 7: receitas, versões e composição de insumos.

@@ -53,12 +53,12 @@ export default async function CadastrosPage() {
             <p className="card-text">Contatos simples para registrar a origem dos lotes e acompanhar custos.</p>
             <span className="card-link">Gerenciar fornecedores →</span>
           </Link>
-          <div className="dark-card">
+          <Link className="dark-card link-card" href="/cadastros/unidades">
             <p className="card-label">Unidades</p>
             <p className="card-title">{totalUnidades ?? 0} disponíveis</p>
             <p className="card-text">Unidades padrão do ERP, prontas para uso nos itens e receitas.</p>
-            <span className="card-link muted-link">Consulta no cadastro de itens</span>
-          </div>
+            <span className="card-link">Ver conversões →</span>
+          </Link>
         </div>
 
         <section className="panel-card">

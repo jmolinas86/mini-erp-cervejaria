@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 const tiposMovimentacao = new Set([
   "entrada_manual",
@@ -33,6 +34,36 @@ function dataISO(value: string, required = false) {
   if (!value) return required ? null : new Date().toISOString();
   const data = new Date(`${value}T12:00:00`);
   return Number.isNaN(data.getTime()) ? null : data.toISOString();
+}
+
+async function converterUnidade(
+  supabase: SupabaseClient,
+  codigoItem: string,
+  codigoEntrada: string,
+  quantidade: number,
+  custo: number | null
+) {
+  const { data: unidades, error } = await supabase
+    .from("unidades")
+    .select("codigo,tipo,unidade_base,fator_para_base")
+    .in("codigo", [codigoItem, codigoEntrada]);
+  if (error) return null;
+
+  const unidadeItem = unidades?.find((unidade) => unidade.codigo === codigoItem);
+  const unidadeEntrada = unidades?.find((unidade) => unidade.codigo === codigoEntrada);
+  if (!unidadeItem || !unidadeEntrada || unidadeItem.tipo !== unidadeEntrada.tipo || (unidadeItem.tipo === "count" && unidadeItem.codigo !== unidadeEntrada.codigo) || unidadeItem.unidade_base !== unidadeEntrada.unidade_base) {
+    return null;
+  }
+
+  const fator = Number(unidadeEntrada.fator_para_base) / Number(unidadeItem.fator_para_base);
+  if (!Number.isFinite(fator) || fator <= 0) return null;
+  return {
+    quantidade: quantidade * fator,
+    custo: custo === null ? null : custo / fator,
+    unidadeItem: unidadeItem.codigo,
+    unidadeEntrada: unidadeEntrada.codigo,
+    quantidadeInformada: quantidade
+  };
 }
 
 function feedback(message: string, error = false): never {
@@ -75,14 +106,22 @@ export async function registrarEntrada(formData: FormData) {
   const idItem = texto(formData, "id_item");
   const idFornecedor = texto(formData, "id_fornecedor");
   const codigoLote = texto(formData, "codigo_lote");
-  const quantidade = numero(formData, "quantidade");
-  const custoUnitario = numero(formData, "custo_unitario");
+  const quantidadeInformada = numero(formData, "quantidade");
+  const custoInformado = numero(formData, "custo_unitario");
+  const codigoUnidadeEntrada = texto(formData, "codigo_unidade_entrada");
   const recebidoEm = dataISO(texto(formData, "recebido_em"), true);
   const validade = texto(formData, "validade");
 
-  if (!isUuid(idItem) || (idFornecedor && !isUuid(idFornecedor)) || !codigoLote || quantidade === null || quantidade <= 0 || custoUnitario === null || !recebidoEm || (validade && !dataISO(validade, true))) {
+  if (!isUuid(idItem) || (idFornecedor && !isUuid(idFornecedor)) || !codigoLote || quantidadeInformada === null || quantidadeInformada <= 0 || custoInformado === null || !codigoUnidadeEntrada || !recebidoEm || (validade && !dataISO(validade, true))) {
     feedback("Preencha item, lote, quantidade, custo e datas válidas.", true);
   }
+
+  const { data: item, error: erroItem } = await supabase.from("itens").select("codigo_unidade").eq("id", idItem).maybeSingle();
+  if (erroItem || !item) feedback("Item não encontrado.", true);
+  const conversao = await converterUnidade(supabase, item.codigo_unidade, codigoUnidadeEntrada, quantidadeInformada, custoInformado);
+  if (!conversao) feedback("A unidade informada não é compatível com a unidade-base do item.", true);
+  const observacoes = texto(formData, "observacoes");
+  const observacaoConversao = conversao.unidadeEntrada === conversao.unidadeItem ? observacoes || null : `${observacoes ? `${observacoes} ` : ""}Entrada informada em ${conversao.quantidadeInformada} ${conversao.unidadeEntrada} e convertida para ${conversao.quantidade} ${conversao.unidadeItem}.`;
 
   const { data: lote, error: erroLote } = await supabase
     .from("lotes_itens")
@@ -91,9 +130,9 @@ export async function registrarEntrada(formData: FormData) {
       id_fornecedor: idFornecedor || null,
       codigo_lote: codigoLote,
       validade: validade || null,
-      custo_unitario: custoUnitario,
+      custo_unitario: conversao.custo,
       recebido_em: recebidoEm.slice(0, 10),
-      observacoes: texto(formData, "observacoes") || null
+      observacoes: observacaoConversao
     })
     .select("id")
     .single();
@@ -104,12 +143,12 @@ export async function registrarEntrada(formData: FormData) {
     id_item: idItem,
     id_lote: lote.id,
     tipo_movimentacao: "compra",
-    quantidade,
-    custo_unitario: custoUnitario,
+    quantidade: conversao.quantidade,
+    custo_unitario: conversao.custo,
     ocorrido_em: recebidoEm,
     tabela_origem: "entrada_estoque",
     id_origem: lote.id,
-    observacoes: texto(formData, "observacoes") || null,
+    observacoes: observacaoConversao,
     criado_por: criadoPor
   });
 
@@ -124,11 +163,12 @@ export async function registrarMovimentacao(formData: FormData) {
   const { supabase, criadoPor } = await autenticado();
   const idLote = texto(formData, "id_lote");
   const tipo = texto(formData, "tipo_movimentacao");
-  const quantidade = numero(formData, "quantidade");
+  const quantidadeInformada = numero(formData, "quantidade");
+  const codigoUnidadeEntrada = texto(formData, "codigo_unidade_entrada");
   const ocorridoEm = dataISO(texto(formData, "ocorrido_em"));
   const custoUnitario = numero(formData, "custo_unitario", true);
 
-  if (!isUuid(idLote) || !tiposMovimentacao.has(tipo) || quantidade === null || quantidade <= 0 || !ocorridoEm) {
+  if (!isUuid(idLote) || !tiposMovimentacao.has(tipo) || quantidadeInformada === null || quantidadeInformada <= 0 || !codigoUnidadeEntrada || !ocorridoEm) {
     feedback("Selecione um lote e informe uma quantidade válida.", true);
   }
 
@@ -139,6 +179,11 @@ export async function registrarMovimentacao(formData: FormData) {
     .maybeSingle();
   if (erroLote || !lote) feedback("Lote não encontrado.", true);
 
+  const { data: item, error: erroItem } = await supabase.from("itens").select("codigo_unidade").eq("id", lote.id_item).maybeSingle();
+  if (erroItem || !item) feedback("Item do lote não encontrado.", true);
+  const conversao = await converterUnidade(supabase, item.codigo_unidade, codigoUnidadeEntrada, quantidadeInformada, custoUnitario);
+  if (!conversao) feedback("A unidade informada não é compatível com a unidade-base do lote.", true);
+
   if (tiposSaida.has(tipo)) {
     const { data: saldo, error: erroSaldo } = await supabase
       .from("vw_saldos_estoque")
@@ -146,18 +191,18 @@ export async function registrarMovimentacao(formData: FormData) {
       .eq("id_lote", idLote)
       .maybeSingle();
     const saldoAtual = Number(saldo?.quantidade_saldo ?? 0);
-    if (erroSaldo || quantidade > saldoAtual) feedback(`Saldo insuficiente. Disponível neste lote: ${saldoAtual}.`, true);
+    if (erroSaldo || conversao.quantidade > saldoAtual) feedback(`Saldo insuficiente. Disponível neste lote: ${saldoAtual} ${item.codigo_unidade}.`, true);
   }
 
   const { error } = await supabase.from("movimentacoes_estoque").insert({
     id_item: lote.id_item,
     id_lote: lote.id,
     tipo_movimentacao: tipo,
-    quantidade,
-    custo_unitario: custoUnitario ?? Number(lote.custo_unitario),
+    quantidade: conversao.quantidade,
+    custo_unitario: conversao.custo ?? Number(lote.custo_unitario),
     ocorrido_em: ocorridoEm,
     tabela_origem: "ajuste_estoque",
-    observacoes: texto(formData, "observacoes") || null,
+    observacoes: `${texto(formData, "observacoes") ? `${texto(formData, "observacoes")} ` : ""}${conversao.unidadeEntrada === conversao.unidadeItem ? "" : `Movimentação informada em ${conversao.quantidadeInformada} ${conversao.unidadeEntrada} e convertida para ${conversao.quantidade} ${conversao.unidadeItem}.`}`.trim() || null,
     criado_por: criadoPor
   });
   if (error) feedback("Não foi possível registrar a movimentação.", true);
