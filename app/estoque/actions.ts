@@ -227,9 +227,10 @@ export async function editarLote(formData: FormData) {
   const codigoLote = texto(formData, "codigo_lote");
   const validade = texto(formData, "validade");
   const quantidadeDesejada = numero(formData, "quantidade_desejada");
+  const custoUnitarioDesejado = numero(formData, "custo_unitario");
 
-  if (!isUuid(idLote) || !codigoLote || codigoLote.length > 80 || quantidadeDesejada === null || (validade && !dataISO(validade, true))) {
-    feedback("Informe lote, validade e uma quantidade válida.", true);
+  if (!isUuid(idLote) || !codigoLote || codigoLote.length > 80 || quantidadeDesejada === null || custoUnitarioDesejado === null || (validade && !dataISO(validade, true))) {
+    feedback("Informe lote, validade, valor unitário e uma quantidade válida.", true);
   }
 
   const { data: lote, error: erroLote } = await supabase
@@ -254,7 +255,7 @@ export async function editarLote(formData: FormData) {
 
   const { error: erroAtualizacao } = await supabase
     .from("lotes_itens")
-    .update({ codigo_lote: codigoLote, validade: validade || null })
+    .update({ codigo_lote: codigoLote, validade: validade || null, custo_unitario: custoUnitarioDesejado })
     .eq("id", lote.id);
   if (erroAtualizacao) feedback("Não foi possível atualizar o lote. Verifique se o código já existe para este item.", true);
 
@@ -267,7 +268,7 @@ export async function editarLote(formData: FormData) {
       id_lote: lote.id,
       tipo_movimentacao: tipo,
       quantidade: Math.abs(diferenca),
-      custo_unitario: lote.custo_unitario,
+      custo_unitario: custoUnitarioDesejado,
       ocorrido_em: new Date().toISOString(),
       tabela_origem: "edicao_lote",
       id_origem: lote.id,
@@ -276,7 +277,7 @@ export async function editarLote(formData: FormData) {
     });
 
     if (erroMovimento) {
-      await supabase.from("lotes_itens").update({ codigo_lote: lote.codigo_lote, validade: lote.validade }).eq("id", lote.id);
+      await supabase.from("lotes_itens").update({ codigo_lote: lote.codigo_lote, validade: lote.validade, custo_unitario: lote.custo_unitario }).eq("id", lote.id);
       feedback("Os dados do lote foram revertidos porque o ajuste de quantidade não pôde ser registrado.", true);
     }
   }
