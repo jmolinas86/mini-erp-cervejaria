@@ -44,7 +44,29 @@ async function autenticado() {
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
   if (!data?.claims) redirect("/login?next=%2Festoque");
-  const criadoPor = typeof data.claims.sub === "string" && isUuid(data.claims.sub) ? data.claims.sub : null;
+  const authId = typeof data.claims.sub === "string" && isUuid(data.claims.sub) ? data.claims.sub : null;
+  const email = typeof data.claims.email === "string" ? data.claims.email : null;
+  let criadoPor: string | null = null;
+
+  if (authId) {
+    const { data: usuarioVinculado } = await supabase
+      .from("usuarios_app")
+      .select("id")
+      .eq("id_usuario_auth", authId)
+      .maybeSingle();
+    criadoPor = usuarioVinculado?.id ?? null;
+  }
+
+  if (!criadoPor && email) {
+    const { data: usuarioPorEmail } = await supabase
+      .from("usuarios_app")
+      .select("id")
+      .eq("email", email)
+      .eq("ativo", true)
+      .maybeSingle();
+    criadoPor = usuarioPorEmail?.id ?? null;
+  }
+
   return { supabase, criadoPor };
 }
 
