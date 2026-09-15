@@ -1,4 +1,5 @@
 import { SupabaseStatus } from "@/components/supabase-status";
+import { AppShell } from "@/components/app-shell";
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -105,6 +106,7 @@ export default async function Home() {
   const erros = [erroSaldos?.message, erroBrassagens?.message].filter(Boolean);
 
   return (
+    <AppShell active="painel" userEmail={email}>
     <main className="page-shell">
       <section className="page-content">
         <div className="page-header">
@@ -242,5 +244,6 @@ export default async function Home() {
         <SupabaseStatus />
       </section>
     </main>
+    </AppShell>
   );
 }

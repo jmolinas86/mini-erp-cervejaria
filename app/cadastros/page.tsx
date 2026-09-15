@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { AppShell } from "@/components/app-shell";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +13,8 @@ export default async function CadastrosPage() {
     redirect("/login?next=%2Fcadastros");
   }
 
+  const email = typeof data.claims.email === "string" ? data.claims.email : undefined;
+
   const [{ count: totalItens }, { count: totalFornecedores }, { count: totalUnidades }] =
     await Promise.all([
       supabase.from("itens").select("id", { count: "exact", head: true }),
@@ -20,6 +23,7 @@ export default async function CadastrosPage() {
     ]);
 
   return (
+    <AppShell active="cadastros" userEmail={email}>
     <main className="page-shell">
       <section className="page-content">
         <div className="page-header">
@@ -68,5 +72,6 @@ export default async function CadastrosPage() {
         </section>
       </section>
     </main>
+    </AppShell>
   );
 }

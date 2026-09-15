@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { AppShell } from "@/components/app-shell";
 import { alternarItem, criarItem, editarItem } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -38,6 +39,7 @@ export default async function ItensPage({
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
   if (!data?.claims) redirect("/login?next=%2Fcadastros%2Fitens");
+  const email = typeof data.claims.email === "string" ? data.claims.email : undefined;
 
   let itensQuery = supabase
     .from("itens")
@@ -58,6 +60,7 @@ export default async function ItensPage({
   const erro = erroItens?.message ?? erroUnidades?.message;
 
   return (
+    <AppShell active="cadastros" userEmail={email}>
     <main className="page-shell">
       <section className="page-content">
         <div className="page-header">
@@ -94,5 +97,6 @@ export default async function ItensPage({
         </section>
       </section>
     </main>
+    </AppShell>
   );
 }

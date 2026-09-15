@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { AppShell } from "@/components/app-shell";
 import { alternarFornecedor, criarFornecedor, editarFornecedor } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -24,6 +25,7 @@ export default async function FornecedoresPage({
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
   if (!data?.claims) redirect("/login?next=%2Fcadastros%2Ffornecedores");
+  const email = typeof data.claims.email === "string" ? data.claims.email : undefined;
 
   let fornecedoresQuery = supabase
     .from("fornecedores")
@@ -36,6 +38,7 @@ export default async function FornecedoresPage({
   const lista = (fornecedores ?? []) as Fornecedor[];
 
   return (
+    <AppShell active="cadastros" userEmail={email}>
     <main className="page-shell">
       <section className="page-content">
         <div className="page-header">
@@ -69,5 +72,6 @@ export default async function FornecedoresPage({
         </section>
       </section>
     </main>
+    </AppShell>
   );
 }
