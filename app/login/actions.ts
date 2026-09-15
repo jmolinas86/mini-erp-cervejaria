@@ -17,6 +17,10 @@ function authError(message: string, next: string): never {
   redirect(`/login?${params.toString()}`);
 }
 
+function siteUrl() {
+  return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+}
+
 export async function login(formData: FormData) {
   const email = field(formData, "email");
   const password = field(formData, "password");
@@ -46,7 +50,15 @@ export async function signup(formData: FormData) {
   }
 
   const supabase = await createClient();
-  const { data, error } = await supabase.auth.signUp({ email, password });
+  const confirmationUrl = new URL("/auth/confirm", siteUrl());
+  confirmationUrl.searchParams.set("next", next);
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: confirmationUrl.toString()
+    }
+  });
 
   if (error) {
     authError(error.message, next);

@@ -13,6 +13,7 @@ Criar a base web do Mini ERP e conectar o app ao Supabase.
 - Build validado.
 - Banco executado e validado no Supabase.
 - Login por email e senha implementado.
+- Confirmação de email com retorno PKCE implementada.
 - Rotas protegidas com `proxy.ts`.
 - Consulta autenticada ao Supabase validada.
 - Painel inicial pós-login criado.
@@ -31,6 +32,7 @@ Criar a base web do Mini ERP e conectar o app ao Supabase.
 | Ajustes do Supabase Advisor | Concluidos |
 | Tradução de tabelas e colunas | Concluida |
 | Login e cadastro | Implementados |
+| Confirmação de email | Implementada com `/auth/confirm` |
 | Proteção de rotas | Validada |
 | Consulta real autenticada | Validada |
 | Painel inicial pós-login | Criado |
@@ -46,9 +48,9 @@ Banco inicial executado no Supabase:
 5. `database/seed/001_seed_demo.sql`
 6. `database/verification/001_check_schema.sql`
 
-Proxima entrega da Fase 3: teste manual do primeiro usuario real no navegador e fechamento da fase.
+Proxima entrega da Fase 3: confirmar o fluxo com um email novo no Brevo e fechar a fase.
 
-Como a confirmação de email esta habilitada no Supabase, o cadastro cria o usuario mas exige confirmação por email antes do primeiro login. Para teste automatico, a criação do usuario técnico funcionou ate essa barreira de confirmação.
+Como a confirmação de email esta habilitada no Supabase, o cadastro cria o usuario e envia o link pelo SMTP configurado. O retorno usa PKCE em `/auth/confirm` antes de liberar a sessão.
 
 ## Tradução do banco
 
@@ -70,6 +72,7 @@ Os nomes continuam sem acentos para evitar problemas em SQL, APIs e TypeScript.
 A base web agora tem:
 
 - `/login` para entrar ou criar conta com email e senha;
+- `/auth/confirm` para trocar o código de confirmação por uma sessão SSR;
 - `/auth/signout` para sair;
 - `proxy.ts` protegendo a home e demais rotas privadas;
 - home autenticada consultando `vw_saldos_estoque` e `brassagens`;

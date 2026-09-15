@@ -37,6 +37,7 @@ pnpm install
 ```text
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
 3. Rodar o app:
@@ -56,7 +57,8 @@ O arquivo `.env.local` nao deve ser enviado ao GitHub.
 - A home autenticada consulta `vw_saldos_estoque` e `brassagens`.
 
 Se a confirmação de email estiver habilitada no Supabase, o usuário precisa
-confirmar o cadastro antes do primeiro acesso.
+confirmar o cadastro antes do primeiro acesso. O link retorna para
+`/auth/confirm`, que troca o código PKCE por uma sessão SSR.
 
 ## Repositorio
 
