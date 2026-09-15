@@ -48,7 +48,7 @@ function dataCurta(value: string | null) {
   return value ? new Intl.DateTimeFormat("pt-BR").format(new Date(value)) : "—";
 }
 
-export default async function EstoquePage({ searchParams }: { searchParams: Promise<{ q?: string; status?: string; error?: string; message?: string }> }) {
+export default async function EstoquePage({ searchParams }: { searchParams: Promise<{ q?: string; tipo?: string; categoria?: string; status?: string; validade?: string; fornecedor?: string; lote?: string; editar?: string; error?: string; message?: string }> }) {
   const params = await searchParams;
   const supabase = await createClient();
   const { data: claims } = await supabase.auth.getClaims();

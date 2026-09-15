@@ -1298,25 +1298,13 @@ td,
 .stock-row-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
-.stock-row-actions .row-details summary {
+.stock-row-edit {
   color: #087c58;
   font-size: 0.72rem;
-}
-
-.stock-row-actions .row-details {
-  position: relative;
-}
-
-.stock-row-actions .details-form {
-  position: absolute;
-  z-index: 5;
-  right: 0;
-  min-width: 300px;
-  background: #ffffff;
-  box-shadow: 0 16px 34px rgba(27, 67, 54, 0.16);
+  font-weight: 750;
 }
 
 .stock-detail-panel {
