@@ -214,3 +214,72 @@ export async function registrarMovimentacao(formData: FormData) {
   if (error) feedback("Não foi possível registrar a movimentação.", true);
   feedback("Movimentação registrada com sucesso.");
 }
+
+/**
+ * Edita os dados de identificação do lote e, quando necessário, registra um
+ * ajuste para chegar ao saldo informado. A quantidade do lote não é gravada
+ * diretamente: o histórico de movimentações continua sendo a fonte de
+ * verdade do estoque.
+ */
+export async function editarLote(formData: FormData) {
+  const { supabase, criadoPor } = await autenticado();
+  const idLote = texto(formData, "id_lote");
+  const codigoLote = texto(formData, "codigo_lote");
+  const validade = texto(formData, "validade");
+  const quantidadeDesejada = numero(formData, "quantidade_desejada");
+
+  if (!isUuid(idLote) || !codigoLote || codigoLote.length > 80 || quantidadeDesejada === null || (validade && !dataISO(validade, true))) {
+    feedback("Informe lote, validade e uma quantidade válida.", true);
+  }
+
+  const { data: lote, error: erroLote } = await supabase
+    .from("lotes_itens")
+    .select("id,id_item,codigo_item,codigo_grupo,codigo_lote,validade,custo_unitario")
+    .eq("id", idLote)
+    .maybeSingle();
+  if (erroLote || !lote) feedback("Lote não encontrado.", true);
+
+  const { data: saldo, error: erroSaldo } = await supabase
+    .from("vw_saldos_estoque")
+    .select("quantidade_saldo")
+    .eq("id_item", lote.id_item)
+    .eq("id_lote", lote.id)
+    .maybeSingle();
+  if (erroSaldo) feedback("Não foi possível consultar o saldo atual do lote.", true);
+
+  const saldoAtual = Number(saldo?.quantidade_saldo ?? 0);
+  if (!Number.isFinite(saldoAtual) || saldoAtual < 0) feedback("O saldo atual do lote é inválido.", true);
+  const diferenca = quantidadeDesejada - saldoAtual;
+  const precisao = 0.0000001;
+
+  const { error: erroAtualizacao } = await supabase
+    .from("lotes_itens")
+    .update({ codigo_lote: codigoLote, validade: validade || null })
+    .eq("id", lote.id);
+  if (erroAtualizacao) feedback("Não foi possível atualizar o lote. Verifique se o código já existe para este item.", true);
+
+  if (Math.abs(diferenca) > precisao) {
+    const tipo = diferenca > 0 ? "ajuste_entrada" : "ajuste_saida";
+    const { error: erroMovimento } = await supabase.from("movimentacoes_estoque").insert({
+      id_item: lote.id_item,
+      codigo_item: lote.codigo_item,
+      codigo_grupo: lote.codigo_grupo,
+      id_lote: lote.id,
+      tipo_movimentacao: tipo,
+      quantidade: Math.abs(diferenca),
+      custo_unitario: lote.custo_unitario,
+      ocorrido_em: new Date().toISOString(),
+      tabela_origem: "edicao_lote",
+      id_origem: lote.id,
+      observacoes: `Saldo ajustado na edição do lote: ${saldoAtual} → ${quantidadeDesejada}.`,
+      criado_por: criadoPor
+    });
+
+    if (erroMovimento) {
+      await supabase.from("lotes_itens").update({ codigo_lote: lote.codigo_lote, validade: lote.validade }).eq("id", lote.id);
+      feedback("Os dados do lote foram revertidos porque o ajuste de quantidade não pôde ser registrado.", true);
+    }
+  }
+
+  feedback(Math.abs(diferenca) > precisao ? "Lote atualizado e ajuste de saldo registrado." : "Lote atualizado com sucesso.");
+}

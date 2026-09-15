@@ -25,7 +25,7 @@ Os cadastros de itens e fornecedores permitem criar, editar e inativar registros
 - unidade e estoque mínimo por item;
 - custo de referência opcional;
 - fornecedor simples para rastreabilidade de compras;
-- código único do item e código do grupo como referências operacionais;
+- código numérico único do item e código do grupo como referências operacionais;
 - layout responsivo com o tema visual definido para o ERP;
 - validação de autenticação, tipo de item, valores não negativos e e-mail.
 

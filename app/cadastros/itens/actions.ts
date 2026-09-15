@@ -42,7 +42,7 @@ async function dadosItem(supabase: Awaited<ReturnType<typeof createClient>>, for
   const estoqueMinimo = numero(formData, "estoque_minimo");
   const custoReferencia = numero(formData, "custo_referencia", true);
 
-  if (!nome || !tiposPermitidos.has(tipo) || !/^[A-Z0-9][A-Z0-9_-]{2,30}$/.test(codigoItem) || !/^[A-Z0-9][A-Z0-9_-]{1,20}$/.test(codigoGrupo) || !codigoUnidade || estoqueMinimo === null || (texto(formData, "custo_referencia") && custoReferencia === null)) {
+  if (!nome || !tiposPermitidos.has(tipo) || !/^\d{4,12}$/.test(codigoItem) || !/^[A-Z0-9][A-Z0-9_-]{1,20}$/.test(codigoGrupo) || !codigoUnidade || estoqueMinimo === null || (texto(formData, "custo_referencia") && custoReferencia === null)) {
     feedback("Preencha nome, código do item, grupo, unidade e valores válidos.", true);
   }
 

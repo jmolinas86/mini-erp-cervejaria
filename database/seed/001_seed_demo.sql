@@ -32,10 +32,10 @@ insert into public.fornecedores (nome, nome_contato, email, observacoes) values
 on conflict (nome) do nothing;
 
 insert into public.itens (codigo_item, codigo_grupo, nome, tipo, categoria, codigo_unidade, estoque_minimo, custo_referencia) values
-  ('MAL-0001', 'MAL', 'Malte Pilsen', 'ingrediente', 'Malte', 'kg', 10.000, 7.2000),
-  ('LUP-0001', 'LUP', 'Lupulo Citra', 'ingrediente', 'Lupulo', 'g', 500.000, 0.1550),
-  ('LEV-0001', 'LEV', 'Levedura US-05', 'ingrediente', 'Levedura', 'pct', 2.000, 28.0000),
-  ('EMB-0001', 'EMB', 'Garrafa 600 ml', 'embalagem', 'Embalagem', 'un', 100.000, 1.1000)
+  ('0001', 'MAL', 'Malte Pilsen', 'ingrediente', 'Malte', 'kg', 10.000, 7.2000),
+  ('0002', 'LUP', 'Lupulo Citra', 'ingrediente', 'Lupulo', 'g', 500.000, 0.1550),
+  ('0003', 'LEV', 'Levedura US-05', 'ingrediente', 'Levedura', 'pct', 2.000, 28.0000),
+  ('0004', 'EMB', 'Garrafa 600 ml', 'embalagem', 'Embalagem', 'un', 100.000, 1.1000)
 on conflict (nome, tipo) do nothing;
 
 insert into public.lotes_itens (id_item, codigo_item, codigo_grupo, id_fornecedor, codigo_lote, validade, custo_unitario, recebido_em)

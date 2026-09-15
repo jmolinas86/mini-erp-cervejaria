@@ -82,7 +82,7 @@ export default async function ItensPage({
           <div className="section-header"><div><p className="eyebrow">Novo registro</p><h2>Cadastrar item</h2></div><span className="status-pill configured">{listaGrupos.length} grupos ativos</span></div>
           <form className="form-grid" action={criarItem}>
             <label className="form-field"><span>Nome *</span><input name="nome" required placeholder="Ex.: Malte Pilsen" /></label>
-            <label className="form-field"><span>Código do item *</span><input name="codigo_item" required pattern="[A-Za-z0-9][A-Za-z0-9_-]{2,30}" placeholder="Ex.: MAL-0001" /></label>
+            <label className="form-field"><span>Código do item *</span><input name="codigo_item" required inputMode="numeric" pattern="[0-9]{4,12}" placeholder="Ex.: 0001" /></label>
             <label className="form-field"><span>Tipo *</span><select name="tipo" required defaultValue="ingrediente">{Object.entries(tipoLabel).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
             <label className="form-field"><span>Grupo *</span><select name="codigo_grupo" required defaultValue=""><option value="" disabled>Selecione o grupo</option>{listaGrupos.map((grupo) => <option value={grupo.codigo} key={grupo.codigo}>{grupo.codigo} · {grupo.nome} ({categoriaGrupo.get(grupo.codigo_categoria) ?? grupo.codigo_categoria})</option>)}</select></label>
             <label className="form-field"><span>Unidade *</span><select name="codigo_unidade" required defaultValue=""><option value="" disabled>Selecione</option>{listaUnidades.map((unidade) => <option key={unidade.codigo} value={unidade.codigo}>{unidade.codigo} · {unidade.nome}</option>)}</select></label>
