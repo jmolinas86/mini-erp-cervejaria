@@ -4,6 +4,9 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 const tiposPermitidos = new Set(["ingrediente", "embalagem", "produto_acabado"]);
+const tiposImagemPermitidos = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+const bucketImagens = "imagens-itens";
+const tamanhoMaximoImagem = 5 * 1024 * 1024;
 
 function texto(formData: FormData, name: string) {
   const value = formData.get(name);
@@ -24,6 +27,23 @@ function isUuid(value: string) {
 function feedback(message: string, error = false): never {
   const params = new URLSearchParams(error ? { error: message } : { message });
   redirect(`/cadastros/itens?${params.toString()}`);
+}
+
+function arquivoImagem(formData: FormData) {
+  const value = formData.get("imagem");
+  if (!(value instanceof File) || value.size === 0) return null;
+  if (!tiposImagemPermitidos.has(value.type) || value.size > tamanhoMaximoImagem) {
+    feedback("A imagem deve ser JPG, PNG, WEBP ou GIF e ter no máximo 5 MB.", true);
+  }
+  return value;
+}
+
+async function enviarImagem(supabase: Awaited<ReturnType<typeof createClient>>, idItem: string, arquivo: File) {
+  const extensao = ({ "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif" } as Record<string, string>)[arquivo.type];
+  const caminho = `${idItem}/imagem.${extensao}`;
+  const { error } = await supabase.storage.from(bucketImagens).upload(caminho, arquivo, { upsert: true, contentType: arquivo.type, cacheControl: "3600" });
+  if (error) return null;
+  return supabase.storage.from(bucketImagens).getPublicUrl(caminho).data.publicUrl;
 }
 
 async function autenticado() {
@@ -55,8 +75,19 @@ async function dadosItem(supabase: Awaited<ReturnType<typeof createClient>>, for
 
 export async function criarItem(formData: FormData) {
   const supabase = await autenticado();
-  const { error } = await supabase.from("itens").insert(await dadosItem(supabase, formData));
-  if (error) feedback("Não foi possível criar o item. Confira se nome, tipo e unidade estão corretos.", true);
+  const dados = await dadosItem(supabase, formData);
+  const arquivo = arquivoImagem(formData);
+  const { data: item, error } = await supabase.from("itens").insert(dados).select("id").single();
+  if (error || !item) feedback("Não foi possível criar o item. Confira se nome, tipo e unidade estão corretos.", true);
+  if (arquivo) {
+    const imagemUrl = await enviarImagem(supabase, item.id, arquivo);
+    if (!imagemUrl) {
+      await supabase.from("itens").delete().eq("id", item.id);
+      feedback("O item não foi criado porque o upload da imagem falhou.", true);
+    }
+    const { error: erroImagem } = await supabase.from("itens").update({ imagem_url: imagemUrl }).eq("id", item.id);
+    if (erroImagem) feedback("O item foi criado, mas não foi possível salvar a imagem.", true);
+  }
   feedback("Item criado com sucesso.");
 }
 
@@ -65,9 +96,12 @@ export async function editarItem(formData: FormData) {
   if (!isUuid(id)) feedback("Item inválido.", true);
   const supabase = await autenticado();
   const dados = await dadosItem(supabase, formData);
-  const { data: atual, error: erroAtual } = await supabase.from("itens").select("codigo_item").eq("id", id).maybeSingle();
+  const { data: atual, error: erroAtual } = await supabase.from("itens").select("codigo_item,imagem_url").eq("id", id).maybeSingle();
   if (erroAtual || !atual || atual.codigo_item !== dados.codigo_item) feedback("O código do item é uma referência fixa e não pode ser alterado.", true);
-  const { error } = await supabase.from("itens").update(dados).eq("id", id);
+  const arquivo = arquivoImagem(formData);
+  const imagemUrl = arquivo ? await enviarImagem(supabase, id, arquivo) : atual.imagem_url;
+  if (arquivo && !imagemUrl) feedback("Não foi possível atualizar a imagem do item.", true);
+  const { error } = await supabase.from("itens").update({ ...dados, imagem_url: imagemUrl }).eq("id", id);
   if (error) feedback("Não foi possível atualizar o item. Confira os dados informados.", true);
   await supabase.from("lotes_itens").update({ codigo_grupo: dados.codigo_grupo }).eq("id_item", id);
   await supabase.from("movimentacoes_estoque").update({ codigo_grupo: dados.codigo_grupo }).eq("id_item", id);

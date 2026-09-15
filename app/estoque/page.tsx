@@ -21,7 +21,7 @@ type Saldo = {
   estoque_minimo: number | string;
   status_estoque: string;
 };
-type Item = { id: string; nome: string; codigo_item: string; codigo_grupo: string; codigo_unidade: string };
+type Item = { id: string; nome: string; codigo_item: string; codigo_grupo: string; codigo_unidade: string; imagem_url: string | null };
 type Fornecedor = { id: string; nome: string };
 type Unidade = { codigo: string; nome: string; tipo: string; unidade_base: string; fator_para_base: number | string };
 type Lote = { id: string; id_item: string; codigo_item: string; codigo_grupo: string; id_fornecedor: string | null; codigo_lote: string; custo_unitario: number | string; validade: string | null };
@@ -57,7 +57,7 @@ export default async function EstoquePage({ searchParams }: { searchParams: Prom
 
   const [{ data: saldos, error: erroSaldos }, { data: itens }, { data: fornecedores }, { data: lotes }, { data: movimentos }, { data: unidades }] = await Promise.all([
     supabase.from("vw_saldos_estoque").select("id_item,nome_item,tipo_item,categoria,codigo_unidade,id_lote,codigo_lote,validade,custo_unitario,quantidade_saldo,estoque_minimo,status_estoque").order("status_estoque").order("nome_item"),
-    supabase.from("itens").select("id,nome,codigo_item,codigo_grupo,codigo_unidade").eq("ativo", true).order("nome"),
+    supabase.from("itens").select("id,nome,codigo_item,codigo_grupo,codigo_unidade,imagem_url").eq("ativo", true).order("nome"),
     supabase.from("fornecedores").select("id,nome").eq("ativo", true).order("nome"),
     supabase.from("lotes_itens").select("id,id_item,codigo_item,codigo_grupo,id_fornecedor,codigo_lote,custo_unitario,validade").order("codigo_lote"),
     supabase.from("movimentacoes_estoque").select("id,id_item,id_lote,codigo_item,codigo_grupo,tipo_movimentacao,quantidade,custo_unitario,ocorrido_em,observacoes").order("ocorrido_em", { ascending: false }).limit(20),

@@ -8,6 +8,7 @@ Esta fase disponibiliza os cadastros necessários para alimentar estoque e recei
 - **Grupos**: classificação por categoria, como Malte, Lúpulo e Sanitizante;
 - **Fornecedores**: nome, contato, e-mail, telefone e observações;
 - **Unidades**: catálogo padrão consultado pelos itens (kg, g, l, ml, pct, un e cilindro).
+- **Imagem**: foto opcional por item, com upload autenticado e leitura pública para o catálogo.
 
 Os cadastros de itens e fornecedores permitem criar, editar e inativar registros. A inativação é reversível e preserva o histórico. O acesso exige autenticação e as operações usam as políticas RLS do Supabase.
 
@@ -28,5 +29,6 @@ Os cadastros de itens e fornecedores permitem criar, editar e inativar registros
 - código numérico único do item e código do grupo como referências operacionais;
 - layout responsivo com o tema visual definido para o ERP;
 - validação de autenticação, tipo de item, valores não negativos e e-mail.
+- upload opcional de imagens JPG, PNG, WEBP ou GIF de até 5 MB;
 
 O próximo passo é a Fase 6: lotes, entradas e movimentações de estoque.

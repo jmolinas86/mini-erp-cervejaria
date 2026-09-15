@@ -11,7 +11,7 @@ O módulo de estoque permite controlar a posição física por lote e manter o h
 - validação de saldo antes de qualquer saída;
 - saldo e status calculados pela view `vw_saldos_estoque`;
 - valor estimado do estoque por custo dos lotes;
-- histórico recente de movimentações.
+- histórico recente de movimentações;
 - edição do código do lote, validade e saldo desejado, com ajuste automático auditável;
 
 ## Como acessar

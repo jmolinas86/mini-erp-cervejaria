@@ -21,6 +21,7 @@ Mini ERP para cervejaria caseira, sem modulo fiscal, com foco em estoque, receit
 - `docs/supabase-conexao.md`: passo a passo para executar e validar o banco no Supabase.
 - `database/migrations/001_initial_schema.sql`: primeira versao do schema PostgreSQL.
 - `database/migrations/002_supabase_advisor_fixes.sql`: ajustes recomendados pelo Supabase Advisor.
+- `database/migrations/008_imagens_itens.sql`: coluna de imagem dos itens e bucket do catálogo no Storage.
 - `database/seed/001_seed_demo.sql`: dados de exemplo para validar o modelo.
 - `database/verification/001_check_schema.sql`: consultas para validar se o schema e o seed foram criados corretamente.
 
