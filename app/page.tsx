@@ -1,5 +1,6 @@
 import { SupabaseStatus } from "@/components/supabase-status";
 import { createClient } from "@/lib/supabase/server";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
@@ -115,11 +116,16 @@ export default async function Home() {
               Supabase com as tabelas em português.
             </p>
           </div>
-          <form action="/auth/signout" method="post">
-            <button className="button secondary" type="submit">
-              Sair
-            </button>
-          </form>
+          <div className="page-header-actions">
+            <Link className="button secondary" href="/cadastros">
+              Cadastros
+            </Link>
+            <form action="/auth/signout" method="post">
+              <button className="button secondary" type="submit">
+                Sair
+              </button>
+            </form>
+          </div>
         </div>
 
         <div className="card-grid">
