@@ -701,6 +701,133 @@ td span {
   }
 }
 
+/* Layout aprovado para o detalhe da brassagem */
+.brew-batch-page .page-content { max-width: 1420px; }
+.brew-batch-header { display: flex; justify-content: space-between; gap: 24px; align-items: flex-start; padding: 8px 4px 0; }
+.brew-breadcrumb { color: #607184; font-size: .78rem; margin-bottom: 12px; }
+.brew-breadcrumb span { margin: 0 10px; color: #9aa8b5; }
+.brew-breadcrumb strong { color: #24384a; }
+.brew-title-line { display: flex; align-items: center; gap: 14px; }
+.brew-title-line h1 { margin: 0; color: #102438; font-size: 2rem; line-height: 1.1; letter-spacing: -.04em; }
+.brew-title-line + h2 { margin: 5px 0 0; color: #233b4d; font-size: 1.05rem; font-weight: 650; }
+.brew-meta { display: flex; flex-wrap: wrap; gap: 10px; margin: 7px 0 0; color: #647689; font-size: .78rem; }
+.brew-meta span { color: #b4bec7; }
+.brew-header-actions { display: flex; gap: 9px; padding-top: 24px; }
+.brew-status-pill { display: inline-flex; align-items: center; border-radius: 999px; padding: 7px 12px; background: #fff0c5; color: #956200; font-size: .76rem; font-weight: 800; }
+.brew-status-pill.finalizada { background: #d8f5e6; color: #087c58; }
+.brew-status-pill.cancelada { background: #ffe1e3; color: #bb2634; }
+.brew-status-pill.rascunho { background: #e9eef3; color: #607184; }
+.brew-batch-layout { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 18px; margin-top: 18px; }
+.brew-batch-main, .brew-batch-sidebar { display: grid; align-content: start; gap: 14px; min-width: 0; }
+.brew-card { border: 1px solid #d9e4ea; border-radius: 7px; background: #fff; box-shadow: 0 5px 18px rgba(30,73,58,.035); padding: 16px; }
+.brew-card-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.brew-card-heading h2 { margin: 0; color: #132638; font-size: 1rem; letter-spacing: -.01em; }
+.brew-card-heading > span, .brew-card-heading > a { color: #087c58; font-size: .74rem; font-weight: 750; }
+.brew-stage-card { padding-bottom: 15px; }
+.brew-stage-line { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.brew-stage-node { display: grid; justify-items: center; text-align: center; gap: 4px; color: #667789; }
+.brew-stage-node > span { display: grid; place-items: center; width: 28px; height: 28px; border: 2px solid #d1dbe3; border-radius: 50%; background: #fff; color: #b7c2cb; font-size: .82rem; font-weight: 800; }
+.brew-stage-node.done > span { border-color: #0a8259; background: #0a8259; color: #fff; }
+.brew-stage-node.current > span { border: 4px solid #aa7400; color: #aa7400; }
+.brew-stage-node strong { color: #1b2e40; font-size: .78rem; }
+.brew-stage-node small { color: #718294; font-size: .69rem; }
+.brew-stage-node em { color: #9aa7b3; font-size: .68rem; font-style: normal; }
+.brew-stage-node.done em { color: #087c58; }
+.brew-stage-node.current em { color: #aa7400; }
+.brew-stage-connectors { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin: -45px 10% 30px; position: relative; z-index: 0; }
+.brew-stage-connectors i { height: 3px; background: #d9e2e8; }
+.brew-stage-connectors i.done { background: #0a8259; }
+.brew-stage-buttons { display: flex; flex-wrap: wrap; gap: 8px; border-top: 1px solid #edf1f3; padding-top: 13px; }
+.brew-stage-buttons form { margin: 0; }
+.brew-stage-buttons .button { padding: 7px 11px; font-size: .72rem; }
+.brew-kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.brew-kpi-card { display: flex; align-items: center; gap: 10px; padding: 14px; border: 1px solid #dce6eb; border-radius: 7px; background: #fff; }
+.brew-kpi-icon { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; font-size: 1rem; }
+.brew-kpi-icon.green { color: #087c58; background: #e0f5e9; }
+.brew-kpi-icon.blue { color: #1d7491; background: #e1f2f7; }
+.brew-kpi-icon.red { color: #ca3039; background: #ffe6e7; }
+.brew-kpi-icon.gray { color: #395364; background: #edf2f3; }
+.brew-kpi-card small, .brew-kpi-card strong { display: block; }
+.brew-kpi-card small { color: #687a8b; font-size: .7rem; }
+.brew-kpi-card strong { margin-top: 4px; color: #102438; font-size: 1.2rem; letter-spacing: -.02em; }
+.brew-kpi-card strong.negative, .negative { color: #c52d35; }
+.positive { color: #087c58; }
+.muted { color: #99a7b2; }
+.brew-recipe-info { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; padding: 5px 7px 2px; }
+.brew-recipe-info strong { color: #1a3042; font-size: .95rem; }
+.brew-recipe-info span { color: #657687; font-size: .76rem; }
+.brew-recipe-info i { color: #c0cbd2; font-style: normal; }
+.brew-consumption-table { overflow-x: auto; }
+.brew-consumption-head, .brew-consumption-row { display: grid; grid-template-columns: minmax(190px, 1.45fr) .8fr 1.25fr .85fr .8fr; align-items: center; gap: 12px; min-width: 720px; }
+.brew-consumption-head { padding: 9px 12px; background: #f2f5f7; color: #526678; font-size: .7rem; font-weight: 800; }
+.brew-consumption-row { padding: 11px 12px; border-bottom: 1px solid #e7edf0; color: #24394a; font-size: .75rem; }
+.brew-consumption-row:last-child { border-bottom: 0; }
+.brew-consumption-item strong, .brew-consumption-item small, .brew-real-cell strong, .brew-real-cell small { display: block; }
+.brew-consumption-item strong { color: #1c3041; }
+.brew-consumption-item small, .brew-real-cell small { margin-top: 3px; color: #728394; font-size: .68rem; }
+.brew-real-cell { min-width: 0; }
+.brew-confirm-form { display: grid; gap: 5px; }
+.brew-confirm-lot { display: flex; flex-wrap: wrap; align-items: baseline; gap: 5px; }
+.brew-confirm-lot strong { color: #1b3243; }
+.brew-confirm-lot small { color: #778896; font-size: .65rem; }
+.brew-confirm-checkbox { display: inline-flex; align-items: center; gap: 5px; width: fit-content; color: #087c58; font-size: .68rem; font-weight: 800; cursor: pointer; }
+.brew-confirm-checkbox input { accent-color: #087c58; }
+.brew-confirm-checkbox.disabled { color: #bf3641; cursor: not-allowed; }
+.brew-events-list { display: grid; gap: 0; }
+.brew-event-row { display: grid; grid-template-columns: 10px 115px minmax(0, 1fr) 100px 28px; align-items: center; gap: 9px; padding: 8px 0; border-bottom: 1px solid #edf1f3; color: #697b8a; font-size: .72rem; }
+.brew-event-row:last-child { border-bottom: 0; }
+.brew-event-dot { width: 8px; height: 8px; border-radius: 50%; background: #0a8259; }
+.brew-event-row strong { color: #263b4b; font-weight: 600; }
+.brew-event-row b { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #e8edf1; color: #607184; font-size: .6rem; }
+.brew-cost-card .brew-card-heading { margin-bottom: 9px; }
+.brew-cost-line, .brew-cost-detail, .brew-cost-per-liter { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 0; color: #354b5d; font-size: .77rem; }
+.brew-cost-line strong, .brew-cost-detail strong { color: #1b2e40; }
+.brew-cost-diff { display: flex; align-items: center; justify-content: space-between; margin: 4px 0 8px; padding: 8px 10px; border-radius: 5px; background: #ffe7e8; color: #c52d35; font-size: .77rem; font-weight: 800; }
+.brew-cost-card hr { border: 0; border-top: 1px solid #e3eaee; margin: 8px 0; }
+.brew-cost-per-liter { font-size: .8rem; font-weight: 700; }
+.brew-cost-per-liter strong { color: #102438; font-size: 1.15rem; }
+.brew-cost-total { margin-top: 11px; padding: 13px; border-radius: 6px; background: #e4f5ea; color: #355365; }
+.brew-cost-total span, .brew-cost-total small { display: block; font-size: .7rem; }
+.brew-cost-total strong { display: inline-block; margin-top: 3px; color: #102438; font-size: 1.55rem; }
+.brew-actions-card { display: grid; gap: 9px; }
+.brew-actions-card .brew-card-heading { margin-bottom: 3px; }
+.brew-action-button { display: flex; align-items: center; justify-content: center; min-height: 40px; padding: 8px 12px; border: 1px solid #087c58; border-radius: 5px; background: #fff; color: #087c58; font: inherit; font-size: .76rem; font-weight: 800; text-decoration: none; cursor: pointer; }
+.brew-action-button.primary { background: #087c58; color: #fff; }
+.brew-actions-card form { margin: 0; }
+.brew-finalize-form { display: grid; gap: 7px; margin-top: 2px !important; padding-top: 9px; border-top: 1px solid #e7edf0; }
+.brew-finalize-form label span { display: block; margin-bottom: 4px; color: #647689; font-size: .69rem; font-weight: 700; }
+.brew-finalize-form input { width: 100%; box-sizing: border-box; padding: 9px 10px; border: 1px solid #cbd7de; border-radius: 5px; font: inherit; }
+.brew-notes-card { background: #e6f6ea; border-color: #d3eedb; }
+.brew-notes-card p { margin: 0; color: #506b62; font-size: .75rem; line-height: 1.45; }
+.brew-event-form { display: grid; grid-template-columns: 150px minmax(0, 1fr) auto; gap: 8px; }
+.brew-event-form select, .brew-event-form input { min-width: 0; padding: 9px 10px; border: 1px solid #cbd7de; border-radius: 5px; background: #fff; font: inherit; font-size: .75rem; }
+.brew-event-form .button { padding: 8px 14px; }
+
+@media (max-width: 1080px) {
+  .brew-batch-layout { grid-template-columns: 1fr; }
+  .brew-batch-sidebar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .brew-notes-card { grid-column: 1 / -1; }
+}
+@media (max-width: 760px) {
+  .brew-batch-header { flex-direction: column; }
+  .brew-header-actions { width: 100%; padding-top: 0; }
+  .brew-header-actions .button { flex: 1; }
+  .brew-title-line h1 { font-size: 1.55rem; }
+  .brew-kpi-grid, .brew-batch-sidebar { grid-template-columns: 1fr 1fr; }
+  .brew-stage-line { grid-template-columns: repeat(5, 125px); overflow-x: auto; justify-items: center; padding-bottom: 6px; }
+  .brew-stage-connectors { display: none; }
+  .brew-stage-buttons { display: grid; grid-template-columns: 1fr 1fr; }
+  .brew-stage-buttons .button { width: 100%; }
+  .brew-event-row { grid-template-columns: 10px 85px minmax(0, 1fr) 28px; }
+  .brew-event-row > span:nth-of-type(2) { display: none; }
+  .brew-event-form { grid-template-columns: 1fr; }
+}
+@media print {
+  .app-sidebar, .app-topbar, .brew-header-actions, .brew-actions-card, .brew-event-form-card { display: none !important; }
+  .brew-batch-page .page-content { max-width: none; }
+  .brew-batch-layout { grid-template-columns: 1fr; }
+}
+
 /* Shell visual alinhado às referências do BrewerPro */
 .app-shell {
   min-height: 100vh;
