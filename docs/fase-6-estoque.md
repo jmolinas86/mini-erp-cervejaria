@@ -4,9 +4,9 @@
 
 O módulo de estoque permite controlar a posição física por lote e manter o histórico das alterações:
 
-- entrada de compra com criação de lote;
+- entrada de compra com criação de lote, informando quantidade comprada e valor total pago;
 - fornecedor, validade, data de recebimento e custo unitário;
-- unidade informada na compra com conversão automática para a unidade-base;
+- unidade informada na compra com conversão automática para a unidade-base e cálculo do custo unitário;
 - saída manual, perda, entrada manual e ajustes;
 - validação de saldo antes de qualquer saída;
 - saldo e status calculados pela view `vw_saldos_estoque`;
@@ -28,6 +28,7 @@ As operações exigem autenticação, validam os dados no servidor e registram o
 - estoque mínimo e itens vazios destacados;
 - filtros por item/lote e status;
 - conversão de massa (g/kg) e volume (ml/l), com custo normalizado;
+- custo da compra informado pelo valor total da quantidade adquirida; o ERP grava o custo equivalente por unidade-base;
 - ajustes de quantidade não sobrescrevem o histórico: uma movimentação de ajuste é criada;
 - layout responsivo alinhado às telas de referência do BrewerPro.
 

@@ -107,21 +107,25 @@ export async function registrarEntrada(formData: FormData) {
   const idFornecedor = texto(formData, "id_fornecedor");
   const codigoLote = texto(formData, "codigo_lote");
   const quantidadeInformada = numero(formData, "quantidade");
-  const custoInformado = numero(formData, "custo_unitario");
+  const valorTotalInformado = numero(formData, "valor_total");
   const codigoUnidadeEntrada = texto(formData, "codigo_unidade_entrada");
   const recebidoEm = dataISO(texto(formData, "recebido_em"), true);
   const validade = texto(formData, "validade");
 
-  if (!isUuid(idItem) || (idFornecedor && !isUuid(idFornecedor)) || !codigoLote || quantidadeInformada === null || quantidadeInformada <= 0 || custoInformado === null || !codigoUnidadeEntrada || !recebidoEm || (validade && !dataISO(validade, true))) {
-    feedback("Preencha item, lote, quantidade, custo e datas válidas.", true);
+  if (!isUuid(idItem) || (idFornecedor && !isUuid(idFornecedor)) || !codigoLote || quantidadeInformada === null || quantidadeInformada <= 0 || valorTotalInformado === null || !codigoUnidadeEntrada || !recebidoEm || (validade && !dataISO(validade, true))) {
+    feedback("Preencha item, lote, quantidade, valor total e datas válidas.", true);
   }
 
   const { data: item, error: erroItem } = await supabase.from("itens").select("codigo_unidade,codigo_item,codigo_grupo").eq("id", idItem).maybeSingle();
   if (erroItem || !item) feedback("Item não encontrado.", true);
-  const conversao = await converterUnidade(supabase, item.codigo_unidade, codigoUnidadeEntrada, quantidadeInformada, custoInformado);
+  const conversao = await converterUnidade(supabase, item.codigo_unidade, codigoUnidadeEntrada, quantidadeInformada, null);
   if (!conversao) feedback("A unidade informada não é compatível com a unidade-base do item.", true);
+  const custoUnitarioCalculado = conversao.quantidade > 0 ? valorTotalInformado / conversao.quantidade : null;
+  if (custoUnitarioCalculado === null || !Number.isFinite(custoUnitarioCalculado)) feedback("Não foi possível calcular o custo unitário desta entrada.", true);
   const observacoes = texto(formData, "observacoes");
-  const observacaoConversao = conversao.unidadeEntrada === conversao.unidadeItem ? observacoes || null : `${observacoes ? `${observacoes} ` : ""}Entrada informada em ${conversao.quantidadeInformada} ${conversao.unidadeEntrada} e convertida para ${conversao.quantidade} ${conversao.unidadeItem}.`;
+  const resumoCompra = `Compra: ${conversao.quantidadeInformada} ${conversao.unidadeEntrada} por R$ ${valorTotalInformado.toFixed(2)}; custo calculado: R$ ${custoUnitarioCalculado.toFixed(6)} por ${conversao.unidadeItem}.`;
+  const resumoConversao = conversao.unidadeEntrada === conversao.unidadeItem ? "" : ` Quantidade convertida para ${conversao.quantidade} ${conversao.unidadeItem}.`;
+  const observacaoConversao = `${observacoes ? `${observacoes} ` : ""}${resumoCompra}${resumoConversao}`.trim();
 
   const { data: lote, error: erroLote } = await supabase
     .from("lotes_itens")
@@ -132,7 +136,7 @@ export async function registrarEntrada(formData: FormData) {
       id_fornecedor: idFornecedor || null,
       codigo_lote: codigoLote,
       validade: validade || null,
-      custo_unitario: conversao.custo,
+      custo_unitario: custoUnitarioCalculado,
       recebido_em: recebidoEm.slice(0, 10),
       observacoes: observacaoConversao
     })
@@ -148,7 +152,7 @@ export async function registrarEntrada(formData: FormData) {
     id_lote: lote.id,
     tipo_movimentacao: "compra",
     quantidade: conversao.quantidade,
-    custo_unitario: conversao.custo,
+    custo_unitario: custoUnitarioCalculado,
     ocorrido_em: recebidoEm,
     tabela_origem: "entrada_estoque",
     id_origem: lote.id,
