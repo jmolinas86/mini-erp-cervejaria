@@ -3,6 +3,8 @@ import Link from "next/link";
 type AppShellProps = {
   active?: "painel" | "producao" | "estoque" | "receitas" | "financeiro" | "relatorios" | "cadastros";
   userEmail?: string;
+  contextLabel?: string;
+  contextCurrent?: string;
   children: React.ReactNode;
 };
 
@@ -21,7 +23,7 @@ function iniciais(email?: string) {
   return email.slice(0, 2).toUpperCase();
 }
 
-export function AppShell({ active, userEmail, children }: AppShellProps) {
+export function AppShell({ active, userEmail, contextLabel = "Minha Cervejaria", contextCurrent = "Mini ERP", children }: AppShellProps) {
   return (
     <div className="app-shell">
       <aside className="app-sidebar">
@@ -45,7 +47,7 @@ export function AppShell({ active, userEmail, children }: AppShellProps) {
 
       <div className="app-main">
         <header className="app-topbar">
-          <div className="topbar-context"><span className="mobile-menu" aria-hidden="true">☰</span><span>Minha Cervejaria</span><span className="topbar-separator">/</span><span className="topbar-muted">Mini ERP</span></div>
+          <div className="topbar-context"><span className="mobile-menu" aria-hidden="true">☰</span><span>{contextLabel}</span><span className="topbar-separator">/</span><span className="topbar-muted">{contextCurrent}</span></div>
           <div className="topbar-user"><span className="notification" aria-hidden="true">♧</span><span className="avatar">{iniciais(userEmail)}</span><span><strong>{userEmail ?? "Cervejeiro"}</strong><small>Cervejaria Caseira</small></span><span aria-hidden="true">⌄</span></div>
         </header>
         <div className="app-content">{children}</div>
