@@ -10,7 +10,7 @@ const menu = [
   { key: "painel", href: "/", label: "Painel", icon: "▦" },
   { key: "producao", href: "#", label: "Produção", icon: "♙" },
   { key: "estoque", href: "/estoque", label: "Estoque", icon: "▣" },
-  { key: "receitas", href: "#", label: "Receitas", icon: "▤" },
+  { key: "receitas", href: "/receitas", label: "Receitas", icon: "▤" },
   { key: "financeiro", href: "#", label: "Custos", icon: "$" },
   { key: "relatorios", href: "#", label: "Relatórios", icon: "▥" },
   { key: "cadastros", href: "/cadastros", label: "Cadastros", icon: "⚙" }
