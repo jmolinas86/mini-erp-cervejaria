@@ -30,7 +30,9 @@ function semAcentos(value: string) {
 }
 
 function grupoItem(item: Item | undefined) {
+  const tipo = semAcentos(item?.tipo ?? "").toLowerCase();
   const categoria = semAcentos(item?.categoria ?? "").toLowerCase();
+  if (tipo === "embalagem" || categoria.includes("embalagem")) return "embalagens";
   if (categoria.includes("malte")) return "maltes";
   if (categoria.includes("lup")) return "lupulos";
   return "aditivos";
@@ -39,7 +41,8 @@ function grupoItem(item: Item | undefined) {
 const grupos = [
   { id: "maltes", titulo: "Maltes", icone: "🌾", acao: "Adicionar malte" },
   { id: "lupulos", titulo: "Lúpulos", icone: "🌿", acao: "Adicionar lúpulo" },
-  { id: "aditivos", titulo: "Levedura e aditivos", icone: "🧪", acao: "Adicionar levedura ou aditivo" }
+  { id: "aditivos", titulo: "Levedura e aditivos", icone: "🧪", acao: "Adicionar levedura ou aditivo" },
+  { id: "embalagens", titulo: "Embalagens", icone: "📦", acao: "Adicionar embalagem" }
 ];
 
 export default async function ReceitasPage({ searchParams }: { searchParams: Promise<{ receita?: string; versao?: string; error?: string; message?: string }> }) {
@@ -53,7 +56,7 @@ export default async function ReceitasPage({ searchParams }: { searchParams: Pro
     supabase.from("receitas").select("id,nome,estilo,volume_previsto_litros,observacoes,ativo").order("ativo", { ascending: false }).order("nome"),
     supabase.from("versoes_receitas").select("id,id_receita,numero_versao,og_previsto,fg_previsto,abv_previsto,ibu_previsto,observacoes,ativo").order("numero_versao", { ascending: false }),
     supabase.from("insumos_receita").select("id,id_versao_receita,id_item,etapa,quantidade_prevista,ordem,observacoes").order("ordem"),
-    supabase.from("itens").select("id,nome,codigo_item,categoria,codigo_unidade,tipo,ativo").eq("ativo", true).eq("tipo", "ingrediente").order("nome"),
+    supabase.from("itens").select("id,nome,codigo_item,categoria,codigo_unidade,tipo,ativo").eq("ativo", true).in("tipo", ["ingrediente", "embalagem"]).order("nome"),
     supabase.from("lotes_itens").select("id_item,custo_unitario,recebido_em").order("recebido_em", { ascending: false })
   ]);
 
@@ -72,8 +75,10 @@ export default async function ReceitasPage({ searchParams }: { searchParams: Pro
   const insumosDaVersao = versaoSelecionada ? listaInsumos.filter((insumo) => insumo.id_versao_receita === versaoSelecionada.id) : [];
   const receitaNova = !receitaSelecionada;
   const linkReceita = (id: string, versao?: string) => `/receitas?receita=${id}${versao ? `&versao=${versao}` : ""}`;
-  const custoIngredientes = insumosDaVersao.reduce((total, insumo) => total + numero(insumo.quantidade_prevista) * (custoPorItem.get(insumo.id_item) ?? 0), 0);
-  const custoPorLitro = receitaSelecionada && numero(receitaSelecionada.volume_previsto_litros) > 0 ? custoIngredientes / numero(receitaSelecionada.volume_previsto_litros) : 0;
+  const custoTotalItens = insumosDaVersao.reduce((total, insumo) => total + numero(insumo.quantidade_prevista) * (custoPorItem.get(insumo.id_item) ?? 0), 0);
+  const custoEmbalagens = insumosDaVersao.filter((insumo) => grupoItem(itemPorId.get(insumo.id_item)) === "embalagens").reduce((total, insumo) => total + numero(insumo.quantidade_prevista) * (custoPorItem.get(insumo.id_item) ?? 0), 0);
+  const custoIngredientes = custoTotalItens - custoEmbalagens;
+  const custoPorLitro = receitaSelecionada && numero(receitaSelecionada.volume_previsto_litros) > 0 ? custoTotalItens / numero(receitaSelecionada.volume_previsto_litros) : 0;
   const itensDisponiveis = insumosDaVersao.length > 0 && insumosDaVersao.every((insumo) => custoPorItem.has(insumo.id_item));
 
   return <AppShell active="receitas" userEmail={email} contextLabel="Receitas" contextCurrent={receitaNova ? "Nova receita" : receitaSelecionada.nome}><main className="page-shell recipe-editor-page"><section className="page-content">
@@ -90,7 +95,7 @@ export default async function ReceitasPage({ searchParams }: { searchParams: Pro
       <section className="recipe-card recipe-process-card"><div className="recipe-card-heading"><div><span className="recipe-heading-icon">☷</span><div><h2>Etapas do processo</h2><p>Configure o processo de produção desta receita</p></div></div><span className="recipe-config-link">⚙ &nbsp; Configurar etapas</span></div><div className="process-flow"><div><b>♧</b><span><strong>Mostura</strong><small>67 °C · 60 min</small></span></div><i>›</i><div><b>♨</b><span><strong>Fervura</strong><small>60 min</small></span></div><i>›</i><div><b>♨</b><span><strong>Fermentação</strong><small>19 °C · 5 dias</small></span></div><i>›</i><div><b>▣</b><span><strong>Envase</strong><small>A definir</small></span></div></div></section>
     </div>
 
-    <aside className="recipe-summary-card"><div className="summary-title"><span className="summary-beer-icon">🍺</span><div><p className="eyebrow">Resumo da receita</p><h2>{receitaSelecionada?.nome ?? "Nova receita"}</h2><p>{receitaSelecionada?.estilo ?? "Escolha um estilo"}</p></div></div><div className="summary-metrics"><div><span>OG</span><strong>{versaoSelecionada?.og_previsto ? decimal(versaoSelecionada.og_previsto, 3) : "—"}</strong></div><div><span>FG</span><strong>{versaoSelecionada?.fg_previsto ? decimal(versaoSelecionada.fg_previsto, 3) : "—"}</strong></div><div><span>ABV</span><strong>{versaoSelecionada?.abv_previsto ? `${decimal(versaoSelecionada.abv_previsto, 1)}%` : "—"}</strong></div><div><span>IBU</span><strong>{versaoSelecionada?.ibu_previsto ? decimal(versaoSelecionada.ibu_previsto, 0) : "—"}</strong></div></div><div className="summary-color"><span>●</span><strong>Cor estimada<br /><b>— EBC</b></strong><i /><p>Defina a receita para estimar cor, aroma e amargor.</p></div><div className="summary-costs"><h3>♧ &nbsp; Custos estimados</h3><p><span>Ingredientes</span><b>{custoIngredientes ? moeda(custoIngredientes) : "—"}</b></p><p><span>Embalagens</span><b>—</b></p><div><span>Custo total estimado</span><strong>{custoIngredientes ? moeda(custoIngredientes) : "A calcular"}</strong></div><p className="summary-cost-per-liter"><span>Custo por litro</span><b>{custoPorLitro ? `${moeda(custoPorLitro)} / L` : "—"}</b></p></div><div className={`summary-stock ${itensDisponiveis ? "available" : "pending"}`}><span>{itensDisponiveis ? "✓" : "○"}</span><strong>{itensDisponiveis ? "Todos os ingredientes estão disponíveis em estoque" : "Revise os ingredientes e o estoque"}</strong></div><div className="summary-checklist"><h3>☷ &nbsp; Antes de salvar</h3><p className={receitaNova ? "pending" : "done"}><b>{receitaNova ? "○" : "✓"}</b> Informações básicas</p><p className={insumosDaVersao.length ? "done" : "pending"}><b>{insumosDaVersao.length ? "✓" : "○"}</b> Ingredientes</p><p className="pending"><b>○</b> Etapas do processo</p><p className="pending"><b>○</b> Custos revisados</p></div></aside></div>
+    <aside className="recipe-summary-card"><div className="summary-title"><span className="summary-beer-icon">🍺</span><div><p className="eyebrow">Resumo da receita</p><h2>{receitaSelecionada?.nome ?? "Nova receita"}</h2><p>{receitaSelecionada?.estilo ?? "Escolha um estilo"}</p></div></div><div className="summary-metrics"><div><span>OG</span><strong>{versaoSelecionada?.og_previsto ? decimal(versaoSelecionada.og_previsto, 3) : "—"}</strong></div><div><span>FG</span><strong>{versaoSelecionada?.fg_previsto ? decimal(versaoSelecionada.fg_previsto, 3) : "—"}</strong></div><div><span>ABV</span><strong>{versaoSelecionada?.abv_previsto ? `${decimal(versaoSelecionada.abv_previsto, 1)}%` : "—"}</strong></div><div><span>IBU</span><strong>{versaoSelecionada?.ibu_previsto ? decimal(versaoSelecionada.ibu_previsto, 0) : "—"}</strong></div></div><div className="summary-color"><span>●</span><strong>Cor estimada<br /><b>— EBC</b></strong><i /><p>Defina a receita para estimar cor, aroma e amargor.</p></div><div className="summary-costs"><h3>♧ &nbsp; Custos estimados</h3><p><span>Ingredientes</span><b>{custoIngredientes ? moeda(custoIngredientes) : "—"}</b></p><p><span>Embalagens</span><b>{custoEmbalagens ? moeda(custoEmbalagens) : "—"}</b></p><div><span>Custo total estimado</span><strong>{custoTotalItens ? moeda(custoTotalItens) : "A calcular"}</strong></div><p className="summary-cost-per-liter"><span>Custo por litro</span><b>{custoPorLitro ? `${moeda(custoPorLitro)} / L` : "—"}</b></p></div><div className={`summary-stock ${itensDisponiveis ? "available" : "pending"}`}><span>{itensDisponiveis ? "✓" : "○"}</span><strong>{itensDisponiveis ? "Todos os ingredientes estão disponíveis em estoque" : "Revise os ingredientes e o estoque"}</strong></div><div className="summary-checklist"><h3>☷ &nbsp; Antes de salvar</h3><p className={receitaNova ? "pending" : "done"}><b>{receitaNova ? "○" : "✓"}</b> Informações básicas</p><p className={insumosDaVersao.length ? "done" : "pending"}><b>{insumosDaVersao.length ? "✓" : "○"}</b> Ingredientes</p><p className="pending"><b>○</b> Etapas do processo</p><p className="pending"><b>○</b> Custos revisados</p></div></aside></div>
 
     {listaReceitas.length ? <details className="recipe-catalog"><summary>Receitas cadastradas ({listaReceitas.length})</summary><div>{listaReceitas.map((receita) => <Link href={linkReceita(receita.id)} key={receita.id}>{receita.nome} <span>{receita.ativo ? "Ativa" : "Inativa"}</span></Link>)}</div></details> : null}
   </section></main></AppShell>;

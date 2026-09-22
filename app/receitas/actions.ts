@@ -106,7 +106,7 @@ export async function adicionarInsumo(formData: FormData) {
   }
   if (!uuid(idVersao) || !uuid(idItem) || !etapasPermitidas.has(etapa) || !quantidade || quantidade <= 0) feedback("Preencha insumo, etapa e quantidade válidos.", true, idVersao, idReceita);
   const { data: item } = await supabase.from("itens").select("tipo,ativo").eq("id", idItem).maybeSingle();
-  if (!item || item.tipo !== "ingrediente" || !item.ativo) feedback("Selecione um insumo ativo do cadastro.", true, idVersao, idReceita);
+  if (!item || !["ingrediente", "embalagem"].includes(item.tipo) || !item.ativo) feedback("Selecione um insumo ou embalagem ativo do cadastro.", true, idVersao, idReceita);
   const { error } = await supabase.from("insumos_receita").insert({ id_versao_receita: idVersao, id_item: idItem, etapa, quantidade_prevista: quantidade, ordem, observacoes: texto(formData, "observacoes") || null });
   if (error) feedback("Não foi possível adicionar o insumo. Verifique se ele já está nessa etapa e ordem.", true, idVersao, idReceita);
   feedback("Insumo adicionado à receita.", false, idVersao, idReceita);

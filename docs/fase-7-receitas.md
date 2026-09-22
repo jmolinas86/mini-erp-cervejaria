@@ -9,7 +9,8 @@ Disponibilizar o cadastro de receitas da cervejaria, com versões independentes 
 - Cadastro de receita com nome, estilo, volume previsto e parâmetros de OG, FG, ABV e IBU.
 - Criação automática da versão inicial da receita.
 - Criação de novas versões sem alterar versões já utilizadas.
-- Composição de insumos por versão, incluindo etapa, quantidade, ordem e observação.
+- Composição de insumos e embalagens por versão, incluindo etapa, quantidade, ordem e observação.
+- Agrupamento visual de maltes, lúpulos, leveduras/aditivos e embalagens.
 - Edição e remoção de insumos da composição.
 - Ativação e inativação da receita.
 - Acesso pelo menu **Receitas** e pela rota autenticada `/receitas`.
