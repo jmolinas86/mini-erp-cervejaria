@@ -11,6 +11,7 @@ type Versao = { id: string; id_receita: string; numero_versao: number; og_previs
 type Insumo = { id: string; id_versao_receita: string; id_item: string; etapa: string; quantidade_prevista: number | string; ordem: number; observacoes: string | null };
 type Item = { id: string; nome: string; codigo_item: string; categoria: string; codigo_unidade: string; tipo: string; ativo: boolean };
 type Lote = { id_item: string; custo_unitario: number | string | null; recebido_em: string | null };
+type Saldo = { id_item: string; quantidade_saldo: number | string | null; codigo_unidade: string | null };
 
 function numero(value: number | string | null | undefined) {
   const parsed = Number(value ?? 0);
@@ -52,12 +53,13 @@ export default async function ReceitasPage({ searchParams }: { searchParams: Pro
   if (!claims?.claims) redirect("/login?next=%2Freceitas");
   const email = typeof claims.claims.email === "string" ? claims.claims.email : undefined;
 
-  const [{ data: receitas, error: erroReceitas }, { data: versoes }, { data: insumos }, { data: itens }, { data: lotes }] = await Promise.all([
+  const [{ data: receitas, error: erroReceitas }, { data: versoes }, { data: insumos }, { data: itens }, { data: lotes }, { data: saldos }] = await Promise.all([
     supabase.from("receitas").select("id,nome,estilo,volume_previsto_litros,observacoes,ativo").order("ativo", { ascending: false }).order("nome"),
     supabase.from("versoes_receitas").select("id,id_receita,numero_versao,og_previsto,fg_previsto,abv_previsto,ibu_previsto,observacoes,ativo").order("numero_versao", { ascending: false }),
     supabase.from("insumos_receita").select("id,id_versao_receita,id_item,etapa,quantidade_prevista,ordem,observacoes").order("ordem"),
     supabase.from("itens").select("id,nome,codigo_item,categoria,codigo_unidade,tipo,ativo").eq("ativo", true).in("tipo", ["ingrediente", "embalagem"]).order("nome"),
-    supabase.from("lotes_itens").select("id_item,custo_unitario,recebido_em").order("recebido_em", { ascending: false })
+    supabase.from("lotes_itens").select("id_item,custo_unitario,recebido_em").order("recebido_em", { ascending: false }),
+    supabase.from("vw_saldos_estoque").select("id_item,quantidade_saldo,codigo_unidade")
   ]);
 
   const listaReceitas = (receitas ?? []) as Receita[];
@@ -65,9 +67,12 @@ export default async function ReceitasPage({ searchParams }: { searchParams: Pro
   const listaInsumos = (insumos ?? []) as Insumo[];
   const listaItens = (itens ?? []) as Item[];
   const listaLotes = (lotes ?? []) as Lote[];
+  const listaSaldos = (saldos ?? []) as Saldo[];
   const itemPorId = new Map(listaItens.map((item) => [item.id, item]));
   const custoPorItem = new Map<string, number>();
   for (const lote of listaLotes) if (!custoPorItem.has(lote.id_item)) custoPorItem.set(lote.id_item, numero(lote.custo_unitario));
+  const saldoPorItem = new Map<string, number>();
+  for (const saldo of listaSaldos) saldoPorItem.set(saldo.id_item, (saldoPorItem.get(saldo.id_item) ?? 0) + numero(saldo.quantidade_saldo));
 
   const receitaSelecionada = params.receita ? listaReceitas.find((receita) => receita.id === params.receita) ?? null : null;
   const versoesDaReceita = receitaSelecionada ? listaVersoes.filter((versao) => versao.id_receita === receitaSelecionada.id) : [];
@@ -79,7 +84,10 @@ export default async function ReceitasPage({ searchParams }: { searchParams: Pro
   const custoEmbalagens = insumosDaVersao.filter((insumo) => grupoItem(itemPorId.get(insumo.id_item)) === "embalagens").reduce((total, insumo) => total + numero(insumo.quantidade_prevista) * (custoPorItem.get(insumo.id_item) ?? 0), 0);
   const custoIngredientes = custoTotalItens - custoEmbalagens;
   const custoPorLitro = receitaSelecionada && numero(receitaSelecionada.volume_previsto_litros) > 0 ? custoTotalItens / numero(receitaSelecionada.volume_previsto_litros) : 0;
-  const itensDisponiveis = insumosDaVersao.length > 0 && insumosDaVersao.every((insumo) => custoPorItem.has(insumo.id_item));
+  const necessidadePorItem = new Map<string, number>();
+  for (const insumo of insumosDaVersao) necessidadePorItem.set(insumo.id_item, (necessidadePorItem.get(insumo.id_item) ?? 0) + numero(insumo.quantidade_prevista));
+  const listaCompras = Array.from(necessidadePorItem.entries()).map(([id_item, quantidade]) => ({ id_item, quantidade, disponivel: saldoPorItem.get(id_item) ?? 0, falta: Math.max(quantidade - (saldoPorItem.get(id_item) ?? 0), 0) })).filter((item) => item.falta > 0);
+  const itensDisponiveis = insumosDaVersao.length > 0 && listaCompras.length === 0 && insumosDaVersao.every((insumo) => custoPorItem.has(insumo.id_item));
 
   return <AppShell active="receitas" userEmail={email} contextLabel="Receitas" contextCurrent={receitaNova ? "Nova receita" : receitaSelecionada.nome}><main className="page-shell recipe-editor-page"><section className="page-content">
     <div className="recipe-editor-header"><div><div className="recipe-title-line"><h1>{receitaNova ? "Nova receita" : receitaSelecionada.nome}</h1><span className="recipe-draft-pill">● Rascunho</span></div><p className="intro">Cadastre os parâmetros, ingredientes e etapas de produção</p></div><div className="recipe-editor-actions"><Link className="button secondary" href="/receitas">Cancelar</Link><button className="button secondary" type="submit" form="recipe-info-form" disabled={!receitaNova}>Salvar rascunho</button><button className="button primary" type="submit" form="recipe-info-form" disabled={!receitaNova}>▣ &nbsp; Salvar receita</button></div></div>
@@ -98,5 +106,6 @@ export default async function ReceitasPage({ searchParams }: { searchParams: Pro
     <aside className="recipe-summary-card"><div className="summary-title"><span className="summary-beer-icon">🍺</span><div><p className="eyebrow">Resumo da receita</p><h2>{receitaSelecionada?.nome ?? "Nova receita"}</h2><p>{receitaSelecionada?.estilo ?? "Escolha um estilo"}</p></div></div><div className="summary-metrics"><div><span>OG</span><strong>{versaoSelecionada?.og_previsto ? decimal(versaoSelecionada.og_previsto, 3) : "—"}</strong></div><div><span>FG</span><strong>{versaoSelecionada?.fg_previsto ? decimal(versaoSelecionada.fg_previsto, 3) : "—"}</strong></div><div><span>ABV</span><strong>{versaoSelecionada?.abv_previsto ? `${decimal(versaoSelecionada.abv_previsto, 1)}%` : "—"}</strong></div><div><span>IBU</span><strong>{versaoSelecionada?.ibu_previsto ? decimal(versaoSelecionada.ibu_previsto, 0) : "—"}</strong></div></div><div className="summary-color"><span>●</span><strong>Cor estimada<br /><b>— EBC</b></strong><i /><p>Defina a receita para estimar cor, aroma e amargor.</p></div><div className="summary-costs"><h3>♧ &nbsp; Custos estimados</h3><p><span>Ingredientes</span><b>{custoIngredientes ? moeda(custoIngredientes) : "—"}</b></p><p><span>Embalagens</span><b>{custoEmbalagens ? moeda(custoEmbalagens) : "—"}</b></p><div><span>Custo total estimado</span><strong>{custoTotalItens ? moeda(custoTotalItens) : "A calcular"}</strong></div><p className="summary-cost-per-liter"><span>Custo por litro</span><b>{custoPorLitro ? `${moeda(custoPorLitro)} / L` : "—"}</b></p></div><div className={`summary-stock ${itensDisponiveis ? "available" : "pending"}`}><span>{itensDisponiveis ? "✓" : "○"}</span><strong>{itensDisponiveis ? "Todos os ingredientes estão disponíveis em estoque" : "Revise os ingredientes e o estoque"}</strong></div><div className="summary-checklist"><h3>☷ &nbsp; Antes de salvar</h3><p className={receitaNova ? "pending" : "done"}><b>{receitaNova ? "○" : "✓"}</b> Informações básicas</p><p className={insumosDaVersao.length ? "done" : "pending"}><b>{insumosDaVersao.length ? "✓" : "○"}</b> Ingredientes</p><p className="pending"><b>○</b> Etapas do processo</p><p className="pending"><b>○</b> Custos revisados</p></div></aside></div>
 
     {listaReceitas.length ? <details className="recipe-catalog"><summary>Receitas cadastradas ({listaReceitas.length})</summary><div>{listaReceitas.map((receita) => <Link href={linkReceita(receita.id)} key={receita.id}>{receita.nome} <span>{receita.ativo ? "Ativa" : "Inativa"}</span></Link>)}</div></details> : null}
+    <section className="recipe-shopping-card"><div><p className="eyebrow">Planejamento</p><h2>Lista de compras</h2><p>Itens que precisam ser comprados para executar esta receita.</p></div>{listaCompras.length ? <div className="recipe-shopping-list">{listaCompras.map((compra) => { const item = itemPorId.get(compra.id_item); return <div key={compra.id_item}><span><strong>{item?.nome ?? "Item removido"}</strong><small>{item?.codigo_unidade ?? "unidade"} · disponível {decimal(compra.disponivel, 3)}</small></span><b>Comprar {decimal(compra.falta, 3)} {item?.codigo_unidade ?? ""}</b></div>; })}</div> : <div className="recipe-shopping-ok">✓ Todo o necessário desta receita está disponível no estoque.</div>}</section>
   </section></main></AppShell>;
 }
