@@ -26,9 +26,10 @@ function uuid(value: string) {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
 }
 
-function feedback(message: string, error = false, versao?: string): never {
+function feedback(message: string, error = false, versao?: string, receita?: string): never {
   const params = new URLSearchParams(error ? { error: message } : { message });
   if (versao && uuid(versao)) params.set("versao", versao);
+  if (receita && uuid(receita)) params.set("receita", receita);
   redirect(`/receitas?${params.toString()}`);
 }
 
@@ -75,7 +76,7 @@ export async function criarReceita(formData: FormData) {
     await supabase.from("receitas").delete().eq("id", receita.id);
     feedback("Não foi possível criar a versão inicial da receita.", true);
   }
-  feedback("Receita criada com a versão 1.");
+  feedback("Receita criada com a versão 1.", false, undefined, receita.id);
 }
 
 export async function criarVersao(formData: FormData) {
@@ -87,45 +88,61 @@ export async function criarVersao(formData: FormData) {
   const proximaVersao = Number(ultima?.numero_versao ?? 0) + 1;
   const { error } = await supabase.from("versoes_receitas").insert({ id_receita: idReceita, numero_versao: proximaVersao, ...dadosMetricas, observacoes: texto(formData, "observacoes") || null });
   if (error) feedback("Não foi possível criar a nova versão.", true);
-  feedback(`Versão ${proximaVersao} criada com sucesso.`);
+  feedback(`Versão ${proximaVersao} criada com sucesso.`, false, undefined, idReceita);
 }
 
 export async function adicionarInsumo(formData: FormData) {
   const idVersao = texto(formData, "id_versao_receita");
   const idItem = texto(formData, "id_item");
+  const idReceitaInformado = texto(formData, "id_receita");
   const etapa = texto(formData, "etapa");
   const quantidade = numero(formData, "quantidade_prevista");
   const ordem = inteiro(formData, "ordem", 10);
   const supabase = await autenticado();
-  if (!uuid(idVersao) || !uuid(idItem) || !etapasPermitidas.has(etapa) || !quantidade || quantidade <= 0) feedback("Preencha insumo, etapa e quantidade válidos.", true, idVersao);
+  let idReceita = idReceitaInformado;
+  if (!uuid(idReceita) && uuid(idVersao)) {
+    const { data: versao } = await supabase.from("versoes_receitas").select("id_receita").eq("id", idVersao).maybeSingle();
+    idReceita = versao?.id_receita ?? "";
+  }
+  if (!uuid(idVersao) || !uuid(idItem) || !etapasPermitidas.has(etapa) || !quantidade || quantidade <= 0) feedback("Preencha insumo, etapa e quantidade válidos.", true, idVersao, idReceita);
   const { data: item } = await supabase.from("itens").select("tipo,ativo").eq("id", idItem).maybeSingle();
-  if (!item || item.tipo !== "ingrediente" || !item.ativo) feedback("Selecione um insumo ativo do cadastro.", true, idVersao);
+  if (!item || item.tipo !== "ingrediente" || !item.ativo) feedback("Selecione um insumo ativo do cadastro.", true, idVersao, idReceita);
   const { error } = await supabase.from("insumos_receita").insert({ id_versao_receita: idVersao, id_item: idItem, etapa, quantidade_prevista: quantidade, ordem, observacoes: texto(formData, "observacoes") || null });
-  if (error) feedback("Não foi possível adicionar o insumo. Verifique se ele já está nessa etapa e ordem.", true, idVersao);
-  feedback("Insumo adicionado à receita.", false, idVersao);
+  if (error) feedback("Não foi possível adicionar o insumo. Verifique se ele já está nessa etapa e ordem.", true, idVersao, idReceita);
+  feedback("Insumo adicionado à receita.", false, idVersao, idReceita);
 }
 
 export async function editarInsumo(formData: FormData) {
   const id = texto(formData, "id");
   const idVersao = texto(formData, "id_versao_receita");
+  let idReceita = texto(formData, "id_receita");
   const etapa = texto(formData, "etapa");
   const quantidade = numero(formData, "quantidade_prevista");
   const ordem = inteiro(formData, "ordem", 10);
   const supabase = await autenticado();
-  if (!uuid(id) || !uuid(idVersao) || !etapasPermitidas.has(etapa) || !quantidade || quantidade <= 0) feedback("Dados do insumo inválidos.", true, idVersao);
+  if (!uuid(idReceita) && uuid(idVersao)) {
+    const { data: versao } = await supabase.from("versoes_receitas").select("id_receita").eq("id", idVersao).maybeSingle();
+    idReceita = versao?.id_receita ?? "";
+  }
+  if (!uuid(id) || !uuid(idVersao) || !etapasPermitidas.has(etapa) || !quantidade || quantidade <= 0) feedback("Dados do insumo inválidos.", true, idVersao, idReceita);
   const { error } = await supabase.from("insumos_receita").update({ etapa, quantidade_prevista: quantidade, ordem, observacoes: texto(formData, "observacoes") || null }).eq("id", id);
-  if (error) feedback("Não foi possível atualizar o insumo.", true, idVersao);
-  feedback("Insumo atualizado.", false, idVersao);
+  if (error) feedback("Não foi possível atualizar o insumo.", true, idVersao, idReceita);
+  feedback("Insumo atualizado.", false, idVersao, idReceita);
 }
 
 export async function removerInsumo(formData: FormData) {
   const id = texto(formData, "id");
   const idVersao = texto(formData, "id_versao_receita");
+  let idReceita = texto(formData, "id_receita");
   const supabase = await autenticado();
-  if (!uuid(id)) feedback("Insumo inválido.", true, idVersao);
+  if (!uuid(idReceita) && uuid(idVersao)) {
+    const { data: versao } = await supabase.from("versoes_receitas").select("id_receita").eq("id", idVersao).maybeSingle();
+    idReceita = versao?.id_receita ?? "";
+  }
+  if (!uuid(id)) feedback("Insumo inválido.", true, idVersao, idReceita);
   const { error } = await supabase.from("insumos_receita").delete().eq("id", id);
-  if (error) feedback("Não foi possível remover o insumo.", true, idVersao);
-  feedback("Insumo removido.", false, idVersao);
+  if (error) feedback("Não foi possível remover o insumo.", true, idVersao, idReceita);
+  feedback("Insumo removido.", false, idVersao, idReceita);
 }
 
 export async function alternarReceita(formData: FormData) {
