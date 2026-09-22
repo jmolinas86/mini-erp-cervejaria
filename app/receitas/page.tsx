@@ -25,8 +25,12 @@ function moeda(value: number) {
   return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
+function semAcentos(value: string) {
+  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
 function grupoItem(item: Item | undefined) {
-  const categoria = (item?.categoria ?? "").toLowerCase();
+  const categoria = semAcentos(item?.categoria ?? "").toLowerCase();
   if (categoria.includes("malte")) return "maltes";
   if (categoria.includes("lup")) return "lupulos";
   return "aditivos";
