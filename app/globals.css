@@ -135,6 +135,16 @@ a {
   margin-top: 18px;
 }
 
+.auth-recovery-link {
+  display: inline-block;
+  margin-top: 16px;
+  color: var(--amber);
+  font-size: 0.9rem;
+  font-weight: 750;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .form-message {
   margin: 0 0 18px;
   border-radius: 14px;

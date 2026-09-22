@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { login, signup } from "./actions";
 
 type LoginPageProps = {
@@ -52,6 +53,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               Criar conta
             </button>
           </div>
+          <Link className="auth-recovery-link" href="/login/recuperar-senha">
+            Esqueci minha senha
+          </Link>
         </form>
       </section>
     </main>

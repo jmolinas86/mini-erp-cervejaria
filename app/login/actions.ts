@@ -74,3 +74,24 @@ export async function signup(formData: FormData) {
   });
   redirect(`/login?${params.toString()}`);
 }
+
+export async function requestPasswordReset(formData: FormData) {
+  const email = field(formData, "email");
+
+  if (!email) {
+    redirect("/login/recuperar-senha?error=Informe%20seu%20email.");
+  }
+
+  const supabase = await createClient();
+  const confirmationUrl = new URL("/auth/confirm", siteUrl());
+  confirmationUrl.searchParams.set("next", "/auth/reset-password");
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: confirmationUrl.toString()
+  });
+
+  if (error) {
+    redirect(`/login/recuperar-senha?error=${encodeURIComponent("Não foi possível enviar o email de recuperação. Tente novamente.")}`);
+  }
+
+  redirect("/login/recuperar-senha?message=Se%20o%20email%20estiver%20cadastrado%2C%20enviamos%20um%20link%20para%20redefinir%20a%20senha.");
+}

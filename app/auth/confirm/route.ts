@@ -27,10 +27,10 @@ export async function GET(request: NextRequest) {
     if (error) {
       loginError("Não foi possível confirmar o email. Solicite um novo link.", next);
     }
-  } else if (tokenHash && type === "email") {
+  } else if (tokenHash && (type === "email" || type === "recovery")) {
     const { error } = await supabase.auth.verifyOtp({
       token_hash: tokenHash,
-      type: "email"
+      type
     });
 
     if (error) {
