@@ -2600,6 +2600,88 @@ td,
   font-size: .72rem;
 }
 
+.batch-consumption-check-form {
+  display: grid;
+  grid-template-columns: minmax(145px, 1fr) minmax(170px, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.batch-auto-value {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid #dfe8e4;
+  border-radius: 7px;
+  background: #f8fbfa;
+}
+
+.batch-auto-value span,
+.batch-auto-value small {
+  color: #768696;
+  font-size: .66rem;
+}
+
+.batch-auto-value strong {
+  overflow: hidden;
+  color: #1a3042;
+  font-size: .78rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.batch-confirm-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 7px 10px;
+  border: 1px solid #9acfb5;
+  border-radius: 7px;
+  background: #effaf4;
+  color: #087c58;
+  font-size: .74rem;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.batch-confirm-checkbox input {
+  width: 17px;
+  height: 17px;
+  accent-color: #0d8a61;
+}
+
+.batch-confirm-checkbox.disabled {
+  border-color: #f0c8c8;
+  background: #fff7f7;
+  color: #b42318;
+  cursor: not-allowed;
+}
+
+.batch-confirm-checkbox.disabled input {
+  accent-color: #b42318;
+}
+
+.batch-consumption-confirmed {
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+  padding: 9px 11px;
+  border-radius: 7px;
+  background: #e1f5e9;
+  color: #087c58;
+}
+
+.batch-consumption-confirmed strong {
+  font-size: .78rem;
+}
+
+.batch-consumption-confirmed span {
+  font-size: .7rem;
+}
+
 .batch-saved-mark {
   align-self: center;
   color: #087c58;
@@ -3039,6 +3121,8 @@ td,
   .batch-consumption-form { grid-template-columns: 1fr 1fr; }
   .batch-consumption-form .button,
   .batch-saved-mark { grid-column: 1 / -1; }
+  .batch-consumption-check-form { grid-template-columns: 1fr 1fr; }
+  .batch-confirm-checkbox { grid-column: 1 / -1; justify-content: center; }
   .batch-card-link { align-items: flex-start; }
   .batch-card-meta { min-width: 100px; }
 }

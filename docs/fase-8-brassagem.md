@@ -12,6 +12,8 @@ Abrir uma produção a partir de uma versão de receita, acompanhar suas etapas 
 - Rota autenticada `/brassagens/[id]` com resumo da receita, volume e status.
 - Atualização das etapas planejamento, mostura, fervura, fermentação e envase.
 - Seleção do lote e registro da quantidade real consumida.
+- Sugestão automática do lote mais antigo com saldo (FIFO), exibindo lote e quantidade prevista.
+- Confirmação do consumo por checkbox, sem exigir redigitação da quantidade.
 - Registro de eventos operacionais na linha do tempo.
 - Finalização com volume final e baixa dos consumos no estoque.
 - Baixa de estoque somente no encerramento, conforme decisão do MVP.

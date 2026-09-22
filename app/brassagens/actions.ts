@@ -116,17 +116,24 @@ export async function salvarConsumo(formData: FormData) {
   const id = texto(formData, "id_consumo");
   const idBrassagem = texto(formData, "id_brassagem");
   const idLote = texto(formData, "id_lote");
-  const quantidadeReal = numero(formData, "quantidade_real");
-  if (!uuid(id) || !uuid(idBrassagem) || !uuid(idLote) || quantidadeReal === null || quantidadeReal <= 0) feedback(idBrassagem, "Selecione um lote e informe um consumo maior que zero.", true);
+  const confirmado = texto(formData, "confirmado") === "true";
+  const quantidadeReal = confirmado ? numero(formData, "quantidade_real") : null;
+  if (!uuid(id) || !uuid(idBrassagem) || (confirmado && (!uuid(idLote) || quantidadeReal === null || quantidadeReal <= 0))) feedback(idBrassagem, "Não foi possível confirmar este consumo.", true);
   const { data: brassagem } = await supabase.from("brassagens").select("status").eq("id", idBrassagem).maybeSingle();
   if (!brassagem || ["finalizada", "cancelada"].includes(brassagem.status)) feedback(idBrassagem, "Esta brassagem não pode mais receber alterações.", true);
   const { data: consumo } = await supabase.from("consumos_brassagem").select("id_item,id_brassagem").eq("id", id).eq("id_brassagem", idBrassagem).maybeSingle();
   if (!consumo) feedback(idBrassagem, "Consumo não encontrado.", true);
-  const { data: lote } = await supabase.from("lotes_itens").select("id,id_item").eq("id", idLote).maybeSingle();
-  if (!lote || lote.id_item !== consumo.id_item) feedback(idBrassagem, "O lote selecionado não pertence ao item deste consumo.", true);
-  const { error } = await supabase.from("consumos_brassagem").update({ id_lote: idLote, quantidade_real: quantidadeReal, observacoes: texto(formData, "observacoes") || null }).eq("id", id).eq("id_brassagem", idBrassagem);
+  if (idLote) {
+    const { data: lote } = await supabase.from("lotes_itens").select("id,id_item").eq("id", idLote).maybeSingle();
+    if (!lote || lote.id_item !== consumo.id_item) feedback(idBrassagem, "O lote sugerido não pertence ao item deste consumo.", true);
+    if (confirmado) {
+      const { data: saldo } = await supabase.from("vw_saldos_estoque").select("quantidade_saldo").eq("id_lote", idLote).maybeSingle();
+      if (!saldo || quantidadeReal! > Number(saldo.quantidade_saldo ?? 0)) feedback(idBrassagem, "O saldo atual do lote não é suficiente para confirmar este consumo.", true);
+    }
+  }
+  const { error } = await supabase.from("consumos_brassagem").update({ id_lote: idLote || null, quantidade_real: quantidadeReal, observacoes: texto(formData, "observacoes") || null }).eq("id", id).eq("id_brassagem", idBrassagem);
   if (error) feedback(idBrassagem, "Não foi possível salvar o consumo.", true);
-  feedback(idBrassagem, "Consumo atualizado.");
+  feedback(idBrassagem, confirmado ? "Consumo confirmado." : "Confirmação removida.");
 }
 
 export async function registrarEvento(formData: FormData) {
