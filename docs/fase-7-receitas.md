@@ -4,6 +4,10 @@
 
 Disponibilizar o cadastro de receitas da cervejaria, com versões independentes e os insumos previstos para cada etapa da produção.
 
+## Status
+
+Concluída no código. A validação histórica completa acontece junto com a Fase 8, quando uma brassagem passa a guardar a versão utilizada.
+
 ## Entregas
 
 - Cadastro de receita com nome, estilo, volume previsto e parâmetros de OG, FG, ABV e IBU.
@@ -15,6 +19,8 @@ Disponibilizar o cadastro de receitas da cervejaria, com versões independentes 
 - Ativação e inativação da receita.
 - Acesso pelo menu **Receitas** e pela rota autenticada `/receitas`.
 - Interface responsiva seguindo o tema visual do ERP.
+- Verificação de disponibilidade dos insumos e embalagens no estoque.
+- Lista de compras automática para os itens faltantes da receita.
 
 ## Regras aplicadas
 
@@ -26,4 +32,4 @@ Disponibilizar o cadastro de receitas da cervejaria, com versões independentes 
 
 ## Próximo passo
 
-Integrar a receita selecionada à ordem de brassagem, calculando o consumo previsto e o custo estimado antes do início da produção.
+Integrar a receita selecionada à ordem de brassagem, calculando o consumo previsto e o custo estimado antes do início da produção. Essa integração é a Fase 8.

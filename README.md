@@ -8,7 +8,7 @@ Mini ERP para cervejaria caseira, sem modulo fiscal, com foco em estoque, receit
 - Fase 2 concluida.
 - Supabase criado.
 - Banco inicial executado no Supabase.
-- Fase atual: Fase 3 - Base do sistema.
+- Fase atual: Fase 8 - Brassagem simples.
 - Auth por email e senha configurado com sessões SSR e rotas protegidas.
 - Painel inicial autenticado lendo estoque e brassagens do Supabase.
 
@@ -18,10 +18,13 @@ Mini ERP para cervejaria caseira, sem modulo fiscal, com foco em estoque, receit
 - `docs/fase-1-arquitetura.md`: decisoes iniciais de arquitetura, stack, ambientes e padrao de implementacao.
 - `docs/fase-2-modelo-dados.md`: modelo de dados inicial e regras de estoque/custo.
 - `docs/fase-3-base-sistema.md`: status da base web e proximos passos da Fase 3.
+- `docs/fase-7-receitas.md`: cadastro de receitas, versões e composição de insumos.
+- `docs/fase-8-brassagem.md`: abertura, acompanhamento e finalização de brassagens.
 - `docs/supabase-conexao.md`: passo a passo para executar e validar o banco no Supabase.
 - `database/migrations/001_initial_schema.sql`: primeira versao do schema PostgreSQL.
 - `database/migrations/002_supabase_advisor_fixes.sql`: ajustes recomendados pelo Supabase Advisor.
 - `database/migrations/008_imagens_itens.sql`: coluna de imagem dos itens e bucket do catálogo no Storage.
+- `database/migrations/009_fase8_brassagem_backfill.sql`: prepara consumos de brassagens demonstrativas antigas.
 - `database/seed/001_seed_demo.sql`: dados de exemplo para validar o modelo.
 - `database/verification/001_check_schema.sql`: consultas para validar se o schema e o seed foram criados corretamente.
 
