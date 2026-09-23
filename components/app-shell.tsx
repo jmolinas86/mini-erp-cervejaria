@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PwaInstall } from "@/components/pwa-install";
 
 type AppShellProps = {
   active?: "painel" | "producao" | "estoque" | "receitas" | "financeiro" | "relatorios" | "cadastros";
@@ -48,7 +49,7 @@ export function AppShell({ active, userEmail, contextLabel = "Minha Cervejaria",
       <div className="app-main">
         <header className="app-topbar">
           <div className="topbar-context"><span className="mobile-menu" aria-hidden="true">☰</span><span>{contextLabel}</span><span className="topbar-separator">/</span><span className="topbar-muted">{contextCurrent}</span></div>
-          <div className="topbar-user"><span className="notification" aria-hidden="true">♧</span><span className="avatar">{iniciais(userEmail)}</span><span><strong>{userEmail ?? "Cervejeiro"}</strong><small>Cervejaria Caseira</small></span><span aria-hidden="true">⌄</span></div>
+          <div className="topbar-user"><PwaInstall /><span className="notification" aria-hidden="true">♧</span><span className="avatar">{iniciais(userEmail)}</span><span><strong>{userEmail ?? "Cervejeiro"}</strong><small>Cervejaria Caseira</small></span><span aria-hidden="true">⌄</span></div>
         </header>
         <div className="app-content">{children}</div>
       </div>
