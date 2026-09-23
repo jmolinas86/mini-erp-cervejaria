@@ -29,8 +29,8 @@ export function AppShell({ active, userEmail, contextLabel = "Minha Cervejaria",
     <div className="app-shell">
       <aside className="app-sidebar">
         <Link className="brand" href="/">
-          <span className="brand-mark">♧</span>
-          <span><strong>BrewerPro</strong><small>Mini ERP Cervejeiro</small></span>
+          <img className="brand-logo" src="/hopflow-logo.png" alt="HopFlow" />
+          <span className="brand-subtitle">Mini ERP Cervejeiro</span>
         </Link>
 
         <nav className="sidebar-nav" aria-label="Navegação principal">

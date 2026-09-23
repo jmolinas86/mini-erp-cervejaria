@@ -7,7 +7,7 @@ Permitir que o Mini ERP seja instalado no celular como um aplicativo, mantendo a
 ## Entregas
 
 - Manifesto PWA com nome, ícone, cores e modo standalone.
-- Ícone BrewerPro em SVG para a instalação.
+- Ícone HopFlow da marca para a instalação.
 - Botão contextual “Instalar no celular”, exibido quando o navegador oferece instalação.
 - Detecção de aplicativo já instalado para não repetir o convite.
 - Navegação e painéis preservados em modo responsivo.

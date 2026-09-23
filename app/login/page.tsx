@@ -15,7 +15,8 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   return (
     <main className="auth-shell">
       <section className="auth-card">
-        <p className="eyebrow">Mini ERP Cervejaria</p>
+        <img className="auth-brand-logo" src="/hopflow-logo.png" alt="HopFlow" />
+        <p className="eyebrow">HopFlow · Mini ERP Cervejeiro</p>
         <h1 className="auth-title">Acesse sua operação.</h1>
         <p className="auth-intro">
           Entre com sua conta ou crie um acesso para continuar.

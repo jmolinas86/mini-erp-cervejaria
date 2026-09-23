@@ -30,6 +30,6 @@ As operações exigem autenticação, validam os dados no servidor e registram o
 - conversão de massa (g/kg) e volume (ml/l), com custo normalizado;
 - custo da compra informado pelo valor total da quantidade adquirida; o ERP grava o custo equivalente por unidade-base;
 - ajustes de quantidade não sobrescrevem o histórico: uma movimentação de ajuste é criada;
-- layout responsivo alinhado às telas de referência do BrewerPro.
+- layout responsivo alinhado às telas de referência do HopFlow.
 
 O próximo passo é a Fase 7: receitas, versões e composição de insumos.

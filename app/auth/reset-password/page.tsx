@@ -19,7 +19,8 @@ export default async function ResetPasswordPage({ searchParams }: ResetPasswordP
   return (
     <main className="auth-shell">
       <section className="auth-card">
-        <p className="eyebrow">Mini ERP Cervejaria</p>
+        <img className="auth-brand-logo" src="/hopflow-logo.png" alt="HopFlow" />
+        <p className="eyebrow">HopFlow · Mini ERP Cervejeiro</p>
         <h1 className="auth-title">Crie uma nova senha.</h1>
         <p className="auth-intro">
           Escolha uma senha com pelo menos 8 caracteres para voltar ao ERP.

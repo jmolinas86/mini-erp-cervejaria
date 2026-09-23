@@ -1,4 +1,4 @@
-# Mini ERP Cervejaria
+# HopFlow — Mini ERP Cervejeiro
 
 Mini ERP para cervejaria caseira, sem modulo fiscal, com foco em estoque, receitas, brassagens simples, custo real e dashboard.
 

@@ -11,7 +11,8 @@ export default async function RecuperarSenhaPage({ searchParams }: RecuperarSenh
   return (
     <main className="auth-shell">
       <section className="auth-card">
-        <p className="eyebrow">Mini ERP Cervejaria</p>
+        <img className="auth-brand-logo" src="/hopflow-logo.png" alt="HopFlow" />
+        <p className="eyebrow">HopFlow · Mini ERP Cervejeiro</p>
         <h1 className="auth-title">Recupere seu acesso.</h1>
         <p className="auth-intro">
           Informe seu email e enviaremos um link para criar uma nova senha.
