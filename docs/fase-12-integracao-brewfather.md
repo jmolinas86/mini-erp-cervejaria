@@ -4,6 +4,8 @@
 
 O HopFlow agora possui uma tela em **Cadastros → Brewfather** para consultar e importar o inventário pessoal do Brewfather pela API oficial v2.
 
+Também existe a opção **Captura assistida da tela** em `/integracoes/brewfather/captura`. Ela aceita conteúdo copiado da tela do Brewfather em texto tabular, CSV/TSV ou JSON, mostra uma prévia e só grava após a confirmação.
+
 São consultadas as coleções de:
 
 - fermentáveis (maltes);
@@ -39,4 +41,4 @@ O Brewfather informa unidades métricas; fermentáveis são convertidos de grama
 
 ## Próxima evolução
 
-Depois de validar a primeira importação, podemos adicionar atualização incremental, edição do mapeamento de grupo/unidade e importação de receitas.
+Depois de validar a captura, podemos adicionar leitura automatizada da paginação da tela, edição do mapeamento de grupo/unidade e importação de receitas.
