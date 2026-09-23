@@ -899,8 +899,10 @@ td span {
   display: block;
   width: 154px;
   height: 88px;
+  padding: 8px;
   object-fit: contain;
-  border-radius: 8px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #e4f3e8 0%, #f3e2b5 100%);
 }
 
 .brand-subtitle {
