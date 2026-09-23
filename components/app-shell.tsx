@@ -13,8 +13,8 @@ const menu = [
   { key: "producao", href: "/brassagens", label: "Produção", icon: "♙" },
   { key: "estoque", href: "/estoque", label: "Estoque", icon: "▣" },
   { key: "receitas", href: "/receitas", label: "Receitas", icon: "▤" },
-  { key: "financeiro", href: "#", label: "Custos", icon: "$" },
-  { key: "relatorios", href: "#", label: "Relatórios", icon: "▥" },
+  { key: "financeiro", href: "/relatorios?aba=custos", label: "Custos", icon: "$" },
+  { key: "relatorios", href: "/relatorios", label: "Relatórios", icon: "▥" },
   { key: "cadastros", href: "/cadastros", label: "Cadastros", icon: "⚙" }
 ] as const;
 
@@ -34,7 +34,7 @@ export function AppShell({ active, userEmail, contextLabel = "Minha Cervejaria",
 
         <nav className="sidebar-nav" aria-label="Navegação principal">
           {menu.map((item) => (
-            <Link className={`sidebar-link ${active === item.key ? "active" : ""} ${item.href === "#" ? "disabled" : ""}`} href={item.href} key={item.key} aria-current={active === item.key ? "page" : undefined}>
+            <Link className={`sidebar-link ${active === item.key ? "active" : ""}`} href={item.href} key={item.key} aria-current={active === item.key ? "page" : undefined}>
               <span className="sidebar-icon" aria-hidden="true">{item.icon}</span>
               <span>{item.label}</span>
             </Link>

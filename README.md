@@ -8,7 +8,7 @@ Mini ERP para cervejaria caseira, sem modulo fiscal, com foco em estoque, receit
 - Fase 2 concluida.
 - Supabase criado.
 - Banco inicial executado no Supabase.
-- Fase atual: Fase 8 - Brassagem simples.
+- Fase atual: Fase 9 - Custos, dashboard e relatórios.
 - Auth por email e senha configurado com sessões SSR e rotas protegidas.
 - Painel inicial autenticado lendo estoque e brassagens do Supabase.
 
@@ -20,6 +20,7 @@ Mini ERP para cervejaria caseira, sem modulo fiscal, com foco em estoque, receit
 - `docs/fase-3-base-sistema.md`: status da base web e proximos passos da Fase 3.
 - `docs/fase-7-receitas.md`: cadastro de receitas, versões e composição de insumos.
 - `docs/fase-8-brassagem.md`: abertura, acompanhamento e finalização de brassagens.
+- `docs/fase-9-custos-dashboard.md`: indicadores, custos reais e relatórios operacionais.
 - `docs/supabase-conexao.md`: passo a passo para executar e validar o banco no Supabase.
 - `database/migrations/001_initial_schema.sql`: primeira versao do schema PostgreSQL.
 - `database/migrations/002_supabase_advisor_fixes.sql`: ajustes recomendados pelo Supabase Advisor.
