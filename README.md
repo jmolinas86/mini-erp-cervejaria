@@ -57,6 +57,20 @@ pnpm dev
 
 O arquivo `.env.local` nao deve ser enviado ao GitHub.
 
+### Integração com Brewfather
+
+Para habilitar a importação de insumos, gere uma API key do Brewfather com
+`inventory.read` e adicione ao `.env.local` (somente servidor):
+
+```text
+BREWFATHER_USER_ID=
+BREWFATHER_API_KEY=
+```
+
+Depois, acesse **Cadastros → Brewfather**. O fluxo mostra uma prévia,
+identifica duplicidades e permite escolher se o saldo atual será importado.
+Veja detalhes em `docs/fase-12-integracao-brewfather.md`.
+
 ## Autenticacao
 
 - `/login` permite entrar ou criar uma conta com email e senha.

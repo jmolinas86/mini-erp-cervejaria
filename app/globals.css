@@ -643,6 +643,22 @@ td span {
   color: var(--red-800);
 }
 
+.brewfather-import { display: grid; gap: 18px; }
+.brewfather-import-actions, .brewfather-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.brewfather-import-actions h2 { margin: 8px 0 0; color: var(--text); font-size: 1.55rem; }
+.brewfather-toolbar { flex-wrap: wrap; padding: 12px 14px; border: 1px solid var(--panel-border); border-radius: 16px; background: #f8fbfa; }
+.brewfather-check { display: inline-flex; align-items: center; gap: 8px; color: var(--text); font-size: .88rem; font-weight: 700; }
+.brewfather-check input { width: 17px; height: 17px; accent-color: var(--amber); }
+.brewfather-table { min-width: 760px; }
+.brewfather-table td strong, .brewfather-table td small { display: block; }
+.brewfather-table td small { margin-top: 4px; color: var(--muted); font-size: .78rem; }
+.brewfather-empty { display: grid; gap: 8px; place-items: center; padding: 48px 24px; border: 1px dashed var(--panel-border); border-radius: 18px; color: var(--muted); text-align: center; }
+.brewfather-empty strong { color: var(--text); }
+.brewfather-security { color: var(--text); }
+.brewfather-security h2 { margin: 0; font-size: 1.25rem; }
+.brewfather-security p { max-width: 820px; margin: 12px 0 0; color: var(--muted); line-height: 1.6; }
+.brewfather-security code { border-radius: 5px; padding: 2px 5px; background: #edf4f1; color: #087c58; font-size: .85em; }
+
 @media (max-width: 760px) {
   .page-header {
     flex-direction: column;
@@ -702,6 +718,9 @@ td span {
   .batch-card {
     flex-direction: column;
   }
+
+  .brewfather-import-actions, .brewfather-toolbar { align-items: stretch; flex-direction: column; }
+  .brewfather-import-actions .button, .brewfather-toolbar .button { width: 100%; }
 
   .batch-volume {
     width: 100%;

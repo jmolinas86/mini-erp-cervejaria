@@ -42,6 +42,12 @@ export default async function CadastrosPage() {
         </div>
 
         <div className="card-grid">
+          <Link className="dark-card link-card" href="/integracoes/brewfather">
+            <p className="card-label">Integração</p>
+            <p className="card-title">Brewfather</p>
+            <p className="card-text">Importe seu inventário de maltes, lúpulos, leveduras, sais e outros insumos.</p>
+            <span className="card-link">Abrir importador →</span>
+          </Link>
           <Link className="dark-card link-card" href="/cadastros/itens">
             <p className="card-label">Catálogo</p>
             <p className="card-title">{totalItens ?? 0} itens</p>
