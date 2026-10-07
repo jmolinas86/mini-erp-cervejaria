@@ -46,9 +46,11 @@ function metricas(formData: FormData) {
   const fg = numero(formData, "fg_previsto", true);
   const abv = numero(formData, "abv_previsto", true);
   const ibu = numero(formData, "ibu_previsto", true);
+  const eficiencia = numero(formData, "eficiencia", true);
   if (og !== null && (og < 0.9 || og > 2)) return null;
   if (fg !== null && (fg < 0.9 || fg > 2)) return null;
-  return { og_previsto: og, fg_previsto: fg, abv_previsto: abv, ibu_previsto: ibu };
+  if (eficiencia !== null && (eficiencia < 0 || eficiencia > 100)) return null;
+  return { og_previsto: og, fg_previsto: fg, abv_previsto: abv, ibu_previsto: ibu, eficiencia_percentual: eficiencia };
 }
 
 export async function criarReceita(formData: FormData) {
@@ -79,6 +81,50 @@ export async function criarReceita(formData: FormData) {
   }
   revalidatePath("/receitas");
   feedback("Receita criada com a versão 1.", false, undefined, receita.id);
+}
+
+export async function editarReceita(formData: FormData) {
+  const idReceita = texto(formData, "id_receita");
+  const idVersao = texto(formData, "id_versao_receita");
+  const supabase = await autenticado();
+  const nome = texto(formData, "nome");
+  const estilo = texto(formData, "estilo");
+  const volume = numero(formData, "volume_previsto_litros");
+  const dadosMetricas = metricas(formData);
+
+  if (!uuid(idReceita) || !uuid(idVersao) || !nome || !volume || volume <= 0 || !dadosMetricas) {
+    feedback("Preencha nome, volume e métricas válidas.", true, idVersao, idReceita);
+  }
+
+  const { data: versao, error: erroVersao } = await supabase
+    .from("versoes_receitas")
+    .select("id,id_receita")
+    .eq("id", idVersao)
+    .maybeSingle();
+  if (erroVersao || !versao || versao.id_receita !== idReceita) {
+    feedback("A versão informada não pertence a esta receita.", true, idVersao, idReceita);
+  }
+
+  const { error: erroReceita } = await supabase
+    .from("receitas")
+    .update({
+      nome,
+      estilo: estilo || null,
+      volume_previsto_litros: volume,
+      observacoes: texto(formData, "observacoes") || null
+    })
+    .eq("id", idReceita);
+  if (erroReceita) feedback("Não foi possível atualizar as informações da receita.", true, idVersao, idReceita);
+
+  const { error: erroAtualizarVersao } = await supabase
+    .from("versoes_receitas")
+    .update(dadosMetricas)
+    .eq("id", idVersao)
+    .eq("id_receita", idReceita);
+  if (erroAtualizarVersao) feedback("Não foi possível atualizar as métricas da receita.", true, idVersao, idReceita);
+
+  revalidatePath("/receitas");
+  feedback("Informações da receita atualizadas.", false, idVersao, idReceita);
 }
 
 export async function criarVersao(formData: FormData) {

@@ -2314,7 +2314,8 @@ td,
 
 .recipe-editor-actions {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  align-items: center;
   justify-content: flex-end;
   gap: 10px;
 }
@@ -3488,8 +3489,8 @@ td,
 
 @media (max-width: 760px) {
   .recipe-editor-header { flex-direction: column; }
-  .recipe-editor-actions { width: 100%; justify-content: stretch; }
-  .recipe-editor-actions .button { flex: 1; padding-inline: 8px; text-align: center; }
+  .recipe-editor-actions { width: 100%; flex-wrap: wrap; justify-content: stretch; }
+  .recipe-editor-actions .button { flex: 1 1 145px; padding-inline: 8px; text-align: center; }
   .recipe-stepper { justify-content: flex-start; overflow-x: auto; padding-bottom: 5px; }
   .recipe-stepper i { width: 35px; flex: 0 0 auto; }
   .recipe-info-form { grid-template-columns: 1fr 1fr; }
