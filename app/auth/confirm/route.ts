@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 function safeNext(value: string | null) {
   return value && value.startsWith("/") && !value.startsWith("//")
     ? value
-    : "/";
+    : null;
 }
 
 function loginError(message: string, next: string): never {
@@ -14,10 +14,17 @@ function loginError(message: string, next: string): never {
 }
 
 export async function GET(request: NextRequest) {
-  const next = safeNext(request.nextUrl.searchParams.get("next"));
   const code = request.nextUrl.searchParams.get("code");
   const tokenHash = request.nextUrl.searchParams.get("token_hash");
   const type = request.nextUrl.searchParams.get("type");
+  const isRecovery =
+    request.nextUrl.searchParams.get("flow") === "recovery" ||
+    type === "recovery";
+  // Links de recuperação devem sempre abrir a troca de senha. Alguns
+  // templates do Supabase não preservam o parâmetro `next` no link final.
+  const next = isRecovery
+    ? "/auth/reset-password"
+    : safeNext(request.nextUrl.searchParams.get("next")) ?? "/";
 
   const supabase = await createClient();
 
