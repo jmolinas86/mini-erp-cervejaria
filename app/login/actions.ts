@@ -21,6 +21,20 @@ function siteUrl() {
   return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 }
 
+function mensagemErroRecuperacao(error: { message?: string; code?: string }) {
+  const detalhe = `${error.code ?? ""} ${error.message ?? ""}`.toLocaleLowerCase();
+  if (detalhe.includes("rate") || detalhe.includes("60 seconds") || detalhe.includes("too many")) {
+    return "Aguarde cerca de 60 segundos antes de solicitar outro email de recuperação.";
+  }
+  if (detalhe.includes("redirect") || detalhe.includes("not allowed")) {
+    return `A URL de recuperação não está autorizada no Supabase. Adicione ${siteUrl()}/** em Authentication > URL Configuration.`;
+  }
+  if (detalhe.includes("smtp") || detalhe.includes("email") || detalhe.includes("mail")) {
+    return "O envio de email do Supabase/Brevo falhou. Confira as configurações SMTP e tente novamente.";
+  }
+  return "Não foi possível enviar o email de recuperação. Tente novamente.";
+}
+
 export async function login(formData: FormData) {
   const email = field(formData, "email");
   const password = field(formData, "password");
@@ -90,7 +104,8 @@ export async function requestPasswordReset(formData: FormData) {
   });
 
   if (error) {
-    redirect(`/login/recuperar-senha?error=${encodeURIComponent("Não foi possível enviar o email de recuperação. Tente novamente.")}`);
+    console.error("[HopFlow] Falha ao solicitar recuperação de senha:", error);
+    redirect(`/login/recuperar-senha?error=${encodeURIComponent(mensagemErroRecuperacao(error))}`);
   }
 
   redirect("/login/recuperar-senha?message=Se%20o%20email%20estiver%20cadastrado%2C%20enviamos%20um%20link%20para%20redefinir%20a%20senha.");

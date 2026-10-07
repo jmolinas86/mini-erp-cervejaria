@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
 const etapasPermitidas = new Set(["planejamento", "mostura", "fervura", "fermentacao", "envase"]);
@@ -76,6 +77,7 @@ export async function criarReceita(formData: FormData) {
     await supabase.from("receitas").delete().eq("id", receita.id);
     feedback("Não foi possível criar a versão inicial da receita.", true);
   }
+  revalidatePath("/receitas");
   feedback("Receita criada com a versão 1.", false, undefined, receita.id);
 }
 
@@ -153,4 +155,24 @@ export async function alternarReceita(formData: FormData) {
   const { error } = await supabase.from("receitas").update({ ativo }).eq("id", id);
   if (error) feedback("Não foi possível alterar o status da receita.", true);
   feedback(ativo ? "Receita reativada." : "Receita inativada.");
+}
+
+export async function removerReceita(formData: FormData) {
+  const idReceita = texto(formData, "id");
+  const supabase = await autenticado();
+  if (!uuid(idReceita)) feedback("Receita inválida.", true);
+
+  const { data: versoes, error: erroVersoes } = await supabase.from("versoes_receitas").select("id").eq("id_receita", idReceita);
+  if (erroVersoes) feedback("Não foi possível verificar as versões da receita.", true);
+  const idsVersoes = (versoes ?? []).map((versao) => versao.id);
+  if (idsVersoes.length) {
+    const { data: brassagens, error: erroBrassagens } = await supabase.from("brassagens").select("id").in("id_versao_receita", idsVersoes).limit(1);
+    if (erroBrassagens) feedback("Não foi possível verificar se a receita já foi usada em uma brassagem.", true);
+    if (brassagens?.length) feedback("Essa receita já foi usada em uma brassagem e não pode ser apagada.", true);
+    const { error: erroExcluirVersoes } = await supabase.from("versoes_receitas").delete().in("id", idsVersoes);
+    if (erroExcluirVersoes) feedback("Não foi possível apagar as versões da receita.", true);
+  }
+  const { error } = await supabase.from("receitas").delete().eq("id", idReceita);
+  if (error) feedback("Não foi possível apagar a receita.", true);
+  feedback("Receita apagada com sucesso.");
 }

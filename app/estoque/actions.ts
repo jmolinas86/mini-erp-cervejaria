@@ -112,7 +112,7 @@ export async function registrarEntrada(formData: FormData) {
   const recebidoEm = dataISO(texto(formData, "recebido_em"), true);
   const validade = texto(formData, "validade");
 
-  if (!isUuid(idItem) || (idFornecedor && !isUuid(idFornecedor)) || !codigoLote || quantidadeInformada === null || quantidadeInformada <= 0 || valorTotalInformado === null || !codigoUnidadeEntrada || !recebidoEm || (validade && !dataISO(validade, true))) {
+  if (!isUuid(idItem) || (idFornecedor && !isUuid(idFornecedor)) || !codigoLote || quantidadeInformada === null || quantidadeInformada <= 0 || valorTotalInformado === null || valorTotalInformado <= 0 || !codigoUnidadeEntrada || !recebidoEm || (validade && !dataISO(validade, true))) {
     feedback("Preencha item, lote, quantidade, valor total e datas válidas.", true);
   }
 

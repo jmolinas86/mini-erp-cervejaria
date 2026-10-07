@@ -34,6 +34,21 @@ function valor(value: number | string | null | undefined) {
   return value === null || value === undefined ? "" : String(value);
 }
 
+function FormularioNovoItem({ listaGrupos, listaUnidades, categoriaGrupo, proximoCodigoItem, fecharHref }: { listaGrupos: Grupo[]; listaUnidades: Unidade[]; categoriaGrupo: Map<string, string>; proximoCodigoItem: string; fecharHref: string }) {
+  return <form className="form-grid item-edit-form" action={criarItem} encType="multipart/form-data">
+    <label className="form-field"><span>Nome *</span><input name="nome" required placeholder="Ex.: Malte Pilsen" autoFocus /></label>
+    <label className="form-field"><span>Código do item *</span><input name="codigo_item" required inputMode="numeric" pattern="[0-9]{4,12}" defaultValue={proximoCodigoItem} /><small>Gerado automaticamente; você pode editar.</small></label>
+    <label className="form-field"><span>Tipo *</span><select name="tipo" required defaultValue="ingrediente">{Object.entries(tipoLabel).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
+    <label className="form-field"><span>Grupo *</span><select name="codigo_grupo" required defaultValue=""><option value="" disabled>Selecione o grupo</option>{listaGrupos.map((grupo) => <option value={grupo.codigo} key={grupo.codigo}>{grupo.codigo} · {grupo.nome} ({categoriaGrupo.get(grupo.codigo_categoria) ?? grupo.codigo_categoria})</option>)}</select></label>
+    <label className="form-field"><span>Unidade *</span><select name="codigo_unidade" required defaultValue=""><option value="" disabled>Selecione</option>{listaUnidades.map((unidade) => <option key={unidade.codigo} value={unidade.codigo}>{unidade.codigo} · {unidade.nome}</option>)}</select></label>
+    <label className="form-field"><span>Estoque mínimo *</span><input name="estoque_minimo" type="number" min="0" step="0.001" defaultValue="0" required /></label>
+    <label className="form-field"><span>Custo de referência</span><input name="custo_referencia" type="number" min="0" step="0.0001" placeholder="0,00" /></label>
+    <label className="form-field form-field-wide"><span>Imagem do item</span><input name="imagem" type="file" accept="image/jpeg,image/png,image/webp,image/gif" /><small>Opcional · JPG, PNG, WEBP ou GIF até 5 MB.</small></label>
+    <label className="form-field form-field-wide"><span>Observações</span><textarea name="observacoes" rows={2} placeholder="Informações úteis para o uso do item" /></label>
+    <div className="form-actions form-field-wide"><button className="button primary" type="submit">Salvar item</button><Link className="button secondary" href={fecharHref}>Cancelar</Link></div>
+  </form>;
+}
+
 function FormularioEdicaoItem({ item, listaGrupos, listaUnidades, categoriaGrupo, fecharHref }: { item: Item; listaGrupos: Grupo[]; listaUnidades: Unidade[]; categoriaGrupo: Map<string, string>; fecharHref: string }) {
   return <form className="form-grid item-edit-form" action={editarItem} encType="multipart/form-data">
     <input type="hidden" name="id" value={item.id} />
@@ -53,7 +68,7 @@ function FormularioEdicaoItem({ item, listaGrupos, listaUnidades, categoriaGrupo
 export default async function ItensPage({
   searchParams
 }: {
-  searchParams: Promise<{ q?: string; editar?: string; error?: string; message?: string }>;
+  searchParams: Promise<{ q?: string; grupo?: string; status?: string; novo?: string; editar?: string; error?: string; message?: string }>;
 }) {
   const params = await searchParams;
   const supabase = await createClient();
@@ -69,6 +84,9 @@ export default async function ItensPage({
 
   const busca = params.q?.trim();
   if (busca) itensQuery = itensQuery.or(`nome.ilike.%${busca}%,codigo_item.ilike.%${busca}%`);
+  if (params.grupo) itensQuery = itensQuery.eq("codigo_grupo", params.grupo);
+  if (params.status === "ativo") itensQuery = itensQuery.eq("ativo", true);
+  if (params.status === "inativo") itensQuery = itensQuery.eq("ativo", false);
 
   const [{ data: itens, error: erroItens }, { data: unidades, error: erroUnidades }, { data: grupos, error: erroGrupos }] = await Promise.all([
     itensQuery,
@@ -87,8 +105,14 @@ export default async function ItensPage({
   }, 0);
   const proximoCodigoItem = String(maiorCodigoItem + 1).padStart(4, "0");
   const itemEditando = params.editar ? listaItens.find((item) => item.id === params.editar) ?? null : null;
-  const fecharEditarHref = params.q ? `/cadastros/itens?q=${encodeURIComponent(params.q)}` : "/cadastros/itens";
-  const queryBusca = params.q ? `q=${encodeURIComponent(params.q)}&` : "";
+  const filtros = new URLSearchParams();
+  if (params.q) filtros.set("q", params.q);
+  if (params.grupo) filtros.set("grupo", params.grupo);
+  if (params.status) filtros.set("status", params.status);
+  const queryFiltros = filtros.toString();
+  const fecharEditarHref = queryFiltros ? `/cadastros/itens?${queryFiltros}` : "/cadastros/itens";
+  const hrefNovo = queryFiltros ? `/cadastros/itens?${queryFiltros}&novo=1` : "/cadastros/itens?novo=1";
+  const prefixoFiltros = queryFiltros ? `${queryFiltros}&` : "";
 
   return (
     <AppShell active="cadastros" userEmail={email}>
@@ -104,29 +128,15 @@ export default async function ItensPage({
         {erro ? <p className="form-message error">Não foi possível carregar os dados do cadastro.</p> : null}
 
         {itemEditando ? <div className="item-modal-backdrop"><section className="item-edit-modal" role="dialog" aria-modal="true" aria-labelledby="editar-item-titulo"><div className="item-modal-header"><div><p className="eyebrow">Catálogo de itens</p><h2 id="editar-item-titulo">Editar item</h2><p className="intro">Atualize os dados de {itemEditando.nome}.</p></div><Link className="item-modal-close" href={fecharEditarHref} aria-label="Fechar edição">×</Link></div><FormularioEdicaoItem item={itemEditando} listaGrupos={listaGrupos} listaUnidades={listaUnidades} categoriaGrupo={categoriaGrupo} fecharHref={fecharEditarHref} /></section></div> : null}
+        {params.novo === "1" ? <div className="item-modal-backdrop"><section className="item-edit-modal item-create-modal" role="dialog" aria-modal="true" aria-labelledby="novo-item-titulo"><div className="item-modal-header"><div><p className="eyebrow">Catálogo de itens</p><h2 id="novo-item-titulo">Cadastrar novo item</h2><p className="intro">Inclua um insumo, embalagem ou produto acabado.</p></div><Link className="item-modal-close" href={fecharEditarHref} aria-label="Fechar cadastro">×</Link></div><FormularioNovoItem listaGrupos={listaGrupos} listaUnidades={listaUnidades} categoriaGrupo={categoriaGrupo} proximoCodigoItem={proximoCodigoItem} fecharHref={fecharEditarHref} /></section></div> : null}
 
         <section className="panel-card">
-          <div className="section-header"><div><p className="eyebrow">Novo registro</p><h2>Cadastrar item</h2></div><span className="status-pill configured">{listaGrupos.length} grupos ativos</span></div>
-          <form className="form-grid" action={criarItem} encType="multipart/form-data">
-            <label className="form-field"><span>Nome *</span><input name="nome" required placeholder="Ex.: Malte Pilsen" /></label>
-            <label className="form-field"><span>Código do item *</span><input name="codigo_item" required inputMode="numeric" pattern="[0-9]{4,12}" defaultValue={proximoCodigoItem} /><small>Gerado automaticamente a partir do maior código cadastrado; você pode editar.</small></label>
-            <label className="form-field"><span>Tipo *</span><select name="tipo" required defaultValue="ingrediente">{Object.entries(tipoLabel).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
-            <label className="form-field"><span>Grupo *</span><select name="codigo_grupo" required defaultValue=""><option value="" disabled>Selecione o grupo</option>{listaGrupos.map((grupo) => <option value={grupo.codigo} key={grupo.codigo}>{grupo.codigo} · {grupo.nome} ({categoriaGrupo.get(grupo.codigo_categoria) ?? grupo.codigo_categoria})</option>)}</select></label>
-            <label className="form-field"><span>Unidade *</span><select name="codigo_unidade" required defaultValue=""><option value="" disabled>Selecione</option>{listaUnidades.map((unidade) => <option key={unidade.codigo} value={unidade.codigo}>{unidade.codigo} · {unidade.nome}</option>)}</select></label>
-            <label className="form-field"><span>Estoque mínimo *</span><input name="estoque_minimo" type="number" min="0" step="0.001" defaultValue="0" required /></label>
-            <label className="form-field"><span>Custo de referência</span><input name="custo_referencia" type="number" min="0" step="0.0001" placeholder="0,00" /></label>
-            <label className="form-field form-field-wide"><span>Imagem do item</span><input name="imagem" type="file" accept="image/jpeg,image/png,image/webp,image/gif" /><small>Opcional · JPG, PNG, WEBP ou GIF até 5 MB.</small></label>
-            <label className="form-field form-field-wide"><span>Observações</span><textarea name="observacoes" rows={2} placeholder="Informações úteis para o uso do item" /></label>
-            <div className="form-actions form-field-wide"><button className="button primary" type="submit">Salvar item</button></div>
-          </form>
-        </section>
-
-        <section className="panel-card">
-          <div className="section-header"><div><p className="eyebrow">Catálogo atual</p><h2>{listaItens.length} itens encontrados</h2></div><form className="filter-form" method="get"><input name="q" defaultValue={params.q ?? ""} placeholder="Buscar por nome ou código" /><button className="button secondary" type="submit">Buscar</button></form></div>
+          <div className="section-header item-catalog-header"><div><p className="eyebrow">Catálogo atual</p><h2>{listaItens.length} itens encontrados</h2></div><Link className="button primary" href={hrefNovo}>＋ Cadastrar novo item</Link></div>
+          <form className="item-catalog-filters" method="get"><label className="form-field"><span>Buscar</span><input name="q" defaultValue={params.q ?? ""} placeholder="Nome ou código" /></label><label className="form-field"><span>Grupo</span><select name="grupo" defaultValue={params.grupo ?? ""}><option value="">Todos os grupos</option>{listaGrupos.map((grupo) => <option value={grupo.codigo} key={grupo.codigo}>{grupo.nome}</option>)}</select></label><label className="form-field"><span>Status</span><select name="status" defaultValue={params.status ?? ""}><option value="">Todos</option><option value="ativo">Ativos</option><option value="inativo">Inativos</option></select></label><div className="item-catalog-filter-actions"><button className="button secondary" type="submit">Aplicar filtros</button><Link className="text-link" href="/cadastros/itens">Limpar</Link></div></form>
           <div className="table-wrap"><table><thead><tr><th>Código / item</th><th>Grupo</th><th>Unidade</th><th>Mínimo</th><th>Custo ref.</th><th>Status</th><th>Ações</th></tr></thead><tbody>
-            {listaItens.map((item) => <tr key={item.id}>
+            {listaItens.map((item) => <tr className="item-catalog-row" id={`item-${item.id}`} key={item.id}>
               <td><span className="item-catalog-cell">{item.imagem_url ? <img className="item-thumbnail" src={item.imagem_url} alt="" loading="lazy" /> : <span className="item-thumbnail item-thumbnail-placeholder">▣</span>}<span><strong>{item.codigo_item} · {item.nome}</strong><small>{tipoLabel[item.tipo]}</small></span></span></td><td>{item.codigo_grupo} · {item.categoria}</td><td>{item.codigo_unidade}</td><td>{valor(item.estoque_minimo)}</td><td>{item.custo_referencia === null ? "—" : `R$ ${valor(item.custo_referencia)}`}</td><td><span className={`table-pill ${item.ativo ? "ok" : "inativo"}`}>{item.ativo ? "Ativo" : "Inativo"}</span></td>
-              <td><div className="table-actions"><Link className="button secondary" href={`/cadastros/itens?${queryBusca}editar=${item.id}`}>Editar</Link><form className="inline-form" action={alternarItem}><input type="hidden" name="id" value={item.id} /><input type="hidden" name="ativo" value={String(!item.ativo)} /><button className="button secondary" type="submit">{item.ativo ? "Inativar item" : "Reativar item"}</button></form></div></td>
+              <td><div className="table-actions"><Link className="button secondary" href={`/cadastros/itens?${prefixoFiltros}editar=${item.id}`}>Editar</Link><form className="inline-form" action={alternarItem}><input type="hidden" name="id" value={item.id} /><input type="hidden" name="ativo" value={String(!item.ativo)} />{params.q ? <input type="hidden" name="q" value={params.q} /> : null}{params.grupo ? <input type="hidden" name="grupo" value={params.grupo} /> : null}{params.status ? <input type="hidden" name="status" value={params.status} /> : null}<button className="button secondary" type="submit">{item.ativo ? "Inativar item" : "Reativar item"}</button></form></div></td>
             </tr>)}
           </tbody></table></div>
         </section>

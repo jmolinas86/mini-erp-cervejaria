@@ -24,9 +24,13 @@ function isUuid(value: string) {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
 }
 
-function feedback(message: string, error = false): never {
+function feedback(message: string, error = false, options?: { busca?: string; grupo?: string; status?: string; ancora?: string }): never {
   const params = new URLSearchParams(error ? { error: message } : { message });
-  redirect(`/cadastros/itens?${params.toString()}`);
+  if (options?.busca) params.set("q", options.busca);
+  if (options?.grupo) params.set("grupo", options.grupo);
+  if (options?.status) params.set("status", options.status);
+  const ancora = options?.ancora ? `#item-${encodeURIComponent(options.ancora)}` : "";
+  redirect(`/cadastros/itens?${params.toString()}${ancora}`);
 }
 
 function arquivoImagem(formData: FormData) {
@@ -115,5 +119,5 @@ export async function alternarItem(formData: FormData) {
   const ativo = texto(formData, "ativo") === "true";
   const { error } = await supabase.from("itens").update({ ativo }).eq("id", id);
   if (error) feedback("Não foi possível alterar o status do item.", true);
-  feedback(ativo ? "Item reativado." : "Item inativado.");
+  feedback(ativo ? "Item reativado." : "Item inativado.", false, { busca: texto(formData, "q"), grupo: texto(formData, "grupo"), status: texto(formData, "status"), ancora: id });
 }
