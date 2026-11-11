@@ -5,11 +5,14 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "verify:nfe": "node --experimental-strip-types scripts/verify-nfe-parser.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.7",
     "@supabase/supabase-js": "2.116.0",
+    "fast-xml-parser": "5.12.0",
+    "fast-xml-validator": "1.4.2",
     "next": "16.3.5",
     "pdf-parse": "1.1.1",
     "react": "19.3.0",

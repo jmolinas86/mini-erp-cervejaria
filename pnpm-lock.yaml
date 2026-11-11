@@ -14,6 +14,12 @@ importers:
       '@supabase/supabase-js':
         specifier: 2.116.0
         version: 2.116.0
+      fast-xml-parser:
+        specifier: 5.12.0
+        version: 5.12.0
+      fast-xml-validator:
+        specifier: 1.4.2
+        version: 1.4.2
       next:
         specifier: 16.3.5
         version: 16.3.5(@types/node@26.5.1)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -262,6 +268,18 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@nodable/base-output-builder@2.0.1':
+    resolution: {integrity: sha512-dZ5tRk1YEjKjwEJh/xcPlKWfuuuILj7Nqltlswm4GImQ4pFX94wF83UJ+0Q1YLCTlw8czA7yTGOTbX3++mfbTw==}
+
+  '@nodable/compact-builder@2.0.1':
+    resolution: {integrity: sha512-DyDr1Fo2HW2gXF1AdFHM1X7sGK8Fx7zd+P4bveXymOWyP6kn9HXhtSxBDpTAmGvafQb/pBlQVAPhH8haHv//yA==}
+
+  '@nodable/entities@3.1.0':
+    resolution: {integrity: sha512-LsS/DjHr+uDM647Gru/cA8+J3a3HfhttwCKLyuoyN7yXTFCxKBtSgMQBvrW9yNPa2/zDRUNuGPaH5QUFoa4arQ==}
+
+  '@nodable/flexible-xml-parser@1.11.4':
+    resolution: {integrity: sha512-KzMTEsfLL9OQL7E7TWVM+8dXpwuhteW8jCrmaT+mQaE4NlZhs6AHzfkpY4kTT0qVSeV/lDPKRJW63QwiYjG+kA==}
+
   '@supabase/auth-js@2.116.0':
     resolution: {integrity: sha512-Cmosty12gyKGK9N3bQb+lMmuAFev5nmUzaR1AsmZHqKOAGzqX1VQzmp49CNPwOx/pw0H9Qqk4rs9yhwTlKpfDg==}
     engines: {node: '>=22.0.0'}
@@ -433,6 +451,9 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  anynum@1.0.1:
+    resolution: {integrity: sha512-N6//FLET/tXYNM/F6ABca1oH6fWB+KlTt909Le28WMDBk8oaT4vY17DCrwg2MvmuqUKt3Ni4N5dGJ/EoBgcO6A==}
+
   baseline-browser-mapping@2.11.23:
     resolution: {integrity: sha512-le521dGVfxM7yRX0EikCoSz+rOK+hHzdDt/E7mG1jOJB/6WAAUuwVroLwaB7ApaUsz5Q0kFlDXLSA9MheUIfRQ==}
     engines: {node: '>=6.0.0'}
@@ -459,13 +480,29 @@ packages:
       supports-color:
         optional: true
 
+  detailed-xml-validator@2.2.0:
+    resolution: {integrity: sha512-dffr/kTqIqq2BpybOEddhQRF1KBQcLdKHww9/urAKwZC1+epDnPnbT5IOb0ffCT4QTioAvKYEsojXeOYk030UQ==}
+
   detect-libc@2.1.2:
     resolution: {integrity: sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ==}
     engines: {node: '>=8'}
 
+  fast-xml-builder@1.3.1:
+    resolution: {integrity: sha512-pIM/1n3ntFXKYrUZwW7QCK0gAW7XY+wzj1YMIV3tLDvPj/V+zTGJK5e3/4WJfwj0qWw2ElNXiTixda/R+3YSug==}
+
+  fast-xml-parser@5.12.0:
+    resolution: {integrity: sha512-/pXxRBtwxY9w8z7YbgsvIPPcPvFDsTbIkWwTQJhzNJPokj+TbN6ftmcv4j/pEQDvOCNnKGDzuk5Bo2oogIOiFg==}
+    hasBin: true
+
+  fast-xml-validator@1.4.2:
+    resolution: {integrity: sha512-dN1Z5tBDxhJ1e8ccerKI+MWdwZ8oUWhWTSYISFeHKUOzlaZrwnwxcHKN3d7R9IOqtCtk6ynbEiZhjo/8RtDwIA==}
+
   iceberg-js@0.8.1:
     resolution: {integrity: sha512-1dhVQZXhcHje7798IVM+xoo/1ZdVfzOMIc8/rgVSijRK38EDqOJoGula9N/8ZI5RD8QTxNQtK/Gozpr+qUqRRA==}
     engines: {node: '>=20.0.0'}
+
+  is-unsafe@2.0.3:
+    resolution: {integrity: sha512-ZBllczCCO267vgdFb6Tq3pv+LhHaCiGMdr+ZsuL+OopruAg7S+3ZDs1vD0RPC0uSrkjzbraxaGjtX1YBxjPeFQ==}
 
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
@@ -498,6 +535,10 @@ packages:
 
   node-ensure@0.0.0:
     resolution: {integrity: sha512-DRI60hzo2oKN1ma0ckc6nQWlHU69RH6xN0sjQTjMpChPfTYvKZdcQFfdYK2RWbJcKyUizSIy/l8OTGxMAM1QDw==}
+
+  path-expression-matcher@1.6.2:
+    resolution: {integrity: sha512-enSlaiat05iasnzmgNxRj8reFdj3puY2QpNgP1aPIaVfT6nn9ICuPoFlKHk8EN22HcwewshO+mN2DGbkCEOtqQ==}
+    engines: {node: '>=14.0.0'}
 
   pdf-parse@1.1.1:
     resolution: {integrity: sha512-v6ZJ/efsBpGrGGknjtq9J/oC8tZWq0KWL5vQrk2GlzLEQPUDB1ex+13Rmidl1neNN358Jn9EHZw5y07FFtaC7A==}
@@ -540,6 +581,9 @@ packages:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
     engines: {node: '>=0.10.0'}
 
+  strnum@2.5.1:
+    resolution: {integrity: sha512-UM4nTLWzQiDBseVxUGxN0wJzIk0UU89Qi7pKXz9qISo+lhviJikTuikBsK/oFRlpvYHvSdz0TVoLyQ+sEpYwxA==}
+
   styled-jsx@5.1.6:
     resolution: {integrity: sha512-qSVyDTeMotdvQYoHWLNGwRFJHC+i+ZvdBRYosOFgC+Wg1vx4frN2/RG/NA7SYqqvKNLf39P2LSRA2pu6n0XYZA==}
     engines: {node: '>= 12.0.0'}
@@ -563,6 +607,10 @@ packages:
 
   undici-types@8.9.0:
     resolution: {integrity: sha512-KTDyRTYX8sWmKXAikPHHSyc63CRPETMctyjKFupcC6OBLXT3xsN0e9aF7m+mIXutFWpUXuedtowG7iLOzp0kQg==}
+
+  xml-naming@0.3.0:
+    resolution: {integrity: sha512-ghig2TBE/H11aOVgmahA3MhimvkBr6JIYknH/Dhdk10nXwdbIqBJsbfMxpvFPG8bAw77gN29aQWvKpmVoPlvPQ==}
+    engines: {node: '>=16.0.0'}
 
 snapshots:
 
@@ -704,6 +752,27 @@ snapshots:
   '@next/swc-win32-x64-msvc@16.3.5':
     optional: true
 
+  '@nodable/base-output-builder@2.0.1':
+    dependencies:
+      '@nodable/entities': 3.1.0
+      is-unsafe: 2.0.3
+      path-expression-matcher: 1.6.2
+      strnum: 2.5.1
+
+  '@nodable/compact-builder@2.0.1':
+    dependencies:
+      '@nodable/base-output-builder': 2.0.1
+      path-expression-matcher: 1.6.2
+
+  '@nodable/entities@3.1.0': {}
+
+  '@nodable/flexible-xml-parser@1.11.4':
+    dependencies:
+      '@nodable/base-output-builder': 2.0.1
+      '@nodable/compact-builder': 2.0.1
+      path-expression-matcher: 1.6.2
+      xml-naming: 0.3.0
+
   '@supabase/auth-js@2.116.0':
     dependencies:
       tslib: 2.8.1
@@ -817,6 +886,8 @@ snapshots:
   '@typescript/typescript-win32-x64@7.0.2':
     optional: true
 
+  anynum@1.0.1: {}
+
   baseline-browser-mapping@2.11.23: {}
 
   caniuse-lite@1.0.30001810: {}
@@ -831,10 +902,38 @@ snapshots:
     dependencies:
       ms: 2.1.3
 
+  detailed-xml-validator@2.2.0:
+    dependencies:
+      '@nodable/base-output-builder': 2.0.1
+      '@nodable/compact-builder': 2.0.1
+      '@nodable/flexible-xml-parser': 1.11.4
+
   detect-libc@2.1.2:
     optional: true
 
+  fast-xml-builder@1.3.1:
+    dependencies:
+      path-expression-matcher: 1.6.2
+      xml-naming: 0.3.0
+
+  fast-xml-parser@5.12.0:
+    dependencies:
+      '@nodable/entities': 3.1.0
+      fast-xml-builder: 1.3.1
+      is-unsafe: 2.0.3
+      path-expression-matcher: 1.6.2
+      strnum: 2.5.1
+      xml-naming: 0.3.0
+
+  fast-xml-validator@1.4.2:
+    dependencies:
+      detailed-xml-validator: 2.2.0
+      path-expression-matcher: 1.6.2
+      xml-naming: 0.3.0
+
   iceberg-js@0.8.1: {}
+
+  is-unsafe@2.0.3: {}
 
   ms@2.1.3: {}
 
@@ -866,6 +965,8 @@ snapshots:
       - babel-plugin-macros
 
   node-ensure@0.0.0: {}
+
+  path-expression-matcher@1.6.2: {}
 
   pdf-parse@1.1.1:
     dependencies:
@@ -930,6 +1031,10 @@ snapshots:
 
   source-map-js@1.2.1: {}
 
+  strnum@2.5.1:
+    dependencies:
+      anynum: 1.0.1
+
   styled-jsx@5.1.6(react@19.3.0):
     dependencies:
       client-only: 0.0.1
@@ -961,3 +1066,5 @@ snapshots:
       '@typescript/typescript-win32-x64': 7.0.2
 
   undici-types@8.9.0: {}
+
+  xml-naming@0.3.0: {}

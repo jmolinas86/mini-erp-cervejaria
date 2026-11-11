@@ -65,7 +65,7 @@ export function StockInventory({ email, params, saldos, itens, fornecedores, lot
   return <main className="page-shell stock-page"><section className="page-content">
     <div className="stock-header"><div><h1>Estoque</h1><p className="intro">Controle de insumos, embalagens e produtos acabados</p></div><div className="stock-header-total"><span>Valor estimado</span><strong>R$ {decimal(valorEstoque)}</strong></div></div>
     {params.error ? <p className="form-message error">{params.error}</p> : null}{params.message ? <p className="form-message success">{params.message}</p> : null}
-    <div className="stock-actions-top"><Link className="button primary" href={novaEntradaHref}>＋ Nova entrada</Link><a className="button secondary" href="#nova-movimentacao">↓ Registrar baixa</a><a className="button secondary" href="#nova-movimentacao">✎ Ajuste</a></div>
+    <div className="stock-actions-top"><Link className="button primary" href={novaEntradaHref}>＋ Nova entrada</Link><Link className="button secondary" href="/estoque/notas">▤ Importar NF-e</Link><a className="button secondary" href="#nova-movimentacao">↓ Registrar baixa</a><a className="button secondary" href="#nova-movimentacao">✎ Ajuste</a></div>
     <div className="stock-layout">
       <section className="stock-list-panel">
         <nav className="stock-tabs" aria-label="Tipo de estoque"><Link className={tipoSelecionado === "ingrediente" ? "active" : ""} href="/estoque?tipo=ingrediente">Insumos</Link><Link className={tipoSelecionado === "embalagem" ? "active" : ""} href="/estoque?tipo=embalagem">Embalagens</Link><Link className={tipoSelecionado === "produto_acabado" ? "active" : ""} href="/estoque?tipo=produto_acabado">Produtos acabados</Link></nav>
