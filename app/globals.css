@@ -3825,8 +3825,10 @@ td,
 .invoice-conference-item > header dt { color: #7d8d98; font-size: 0.63rem; }
 .invoice-conference-item > header dd { margin: 0; color: #324a5b; font-size: 0.72rem; font-weight: 800; white-space: nowrap; }
 .invoice-link-state.ignored { background: #e9eef1; color: #627480; }
-.invoice-current-link { margin: 0; padding: 9px 16px; border-top: 1px solid #e7edef; background: #eaf7f0; color: #4a6658; font-size: 0.7rem; }
+.invoice-current-link { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0; padding: 9px 16px; border-top: 1px solid #e7edef; background: #eaf7f0; color: #4a6658; font-size: 0.7rem; }
 .invoice-current-link strong { color: #087451; }
+.invoice-unlink-button { border: 1px solid #d7a9a9; border-radius: 6px; padding: 5px 9px; background: #fff; color: #a33a3a; font: inherit; font-weight: 850; cursor: pointer; white-space: nowrap; }
+.invoice-unlink-button:hover { border-color: #b94242; background: #fff4f4; }
 .invoice-item-workspace { padding: 15px 16px; border-top: 1px solid #e4ebee; }
 .invoice-conference-form {
   display: grid;
@@ -3884,6 +3886,7 @@ td,
   .invoice-ignore-check { grid-column: 1 / -1; }
   .invoice-conversion-preview { grid-column: 1 / -1; }
   .invoice-conference-form > .button { width: 100%; }
+  .invoice-current-link { align-items: flex-start; flex-direction: column; }
 }
 
 @media (max-width: 540px) {

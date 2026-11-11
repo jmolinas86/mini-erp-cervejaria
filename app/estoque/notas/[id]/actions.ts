@@ -274,6 +274,46 @@ export async function salvarConferenciaItem(formData: FormData) {
   );
 }
 
+export async function desvincularItemNota(formData: FormData) {
+  const idNota = texto(formData, "id_nota");
+  const idItemNota = texto(formData, "id_item_nota");
+  if (!isUuid(idNota) || !isUuid(idItemNota)) retorno(idNota || "invalida", "Item da nota inválido.", true);
+  const { supabase } = await autenticado(idNota);
+  const nota = await buscarNotaEmConferencia(supabase, idNota);
+  if (!nota) retorno(idNota, "A nota não está disponível para conferência.", true, idItemNota);
+
+  const { data: linha, error: erroLinha } = await supabase
+    .from("itens_notas_entrada")
+    .select("id,codigo_produto_fornecedor,id_item")
+    .eq("id", idItemNota)
+    .eq("id_nota_entrada", idNota)
+    .maybeSingle();
+  if (erroLinha || !linha) retorno(idNota, "Item não encontrado nesta nota.", true, idItemNota);
+  if (!linha.id_item) retorno(idNota, "Este item já está sem vínculo.", true, idItemNota);
+
+  if (nota.id_fornecedor && linha.codigo_produto_fornecedor) {
+    const { error: erroMapeamento } = await supabase
+      .from("mapeamentos_itens_fornecedores")
+      .delete()
+      .eq("id_fornecedor", nota.id_fornecedor)
+      .eq("codigo_produto_fornecedor", linha.codigo_produto_fornecedor);
+    if (erroMapeamento) retorno(idNota, "Não foi possível remover o mapeamento automático deste produto.", true, idItemNota);
+  }
+
+  const { error } = await supabase.from("itens_notas_entrada").update({
+    id_item: null,
+    codigo_unidade_destino: null,
+    fator_conversao: 1,
+    quantidade_convertida: null,
+    custo_unitario_convertido: null,
+    ignorado: false
+  }).eq("id", idItemNota).eq("id_nota_entrada", idNota);
+  if (error) retorno(idNota, "Não foi possível desvincular este item.", true, idItemNota);
+
+  revalidatePath(`/estoque/notas/${idNota}`);
+  retorno(idNota, "Vínculo removido. Selecione o item correto.", false, idItemNota);
+}
+
 export async function criarItemDaNota(formData: FormData) {
   const idNota = texto(formData, "id_nota");
   const idItemNota = texto(formData, "id_item_nota");

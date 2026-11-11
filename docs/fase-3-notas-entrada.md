@@ -11,6 +11,7 @@ Conferir a nota importada antes de qualquer alteração no estoque. A nota perma
 - vínculo com um fornecedor existente, validando divergência de CNPJ;
 - pesquisa de itens por código ou por qualquer parte do nome;
 - vínculo de cada linha da nota com o item correspondente no HopFlow;
+- opção de desvincular um item incorreto, removendo também o mapeamento memorizado para o fornecedor;
 - fator de conversão entre a unidade comprada e a unidade interna;
 - sugestão automática para unidades diretas e embalagens descritas como `50g`, `500g`, `1kg`, entre outras;
 - cálculo imediato da quantidade convertida e do custo por unidade;

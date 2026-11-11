@@ -5,7 +5,7 @@ import { InvoiceItemConferenceForm, type OpcaoItemConferencia, type UnidadeConfe
 import { SearchableSelect } from "@/components/searchable-select";
 import { decodificarEntidadesXmlBasicas } from "@/lib/nfe/xml";
 import { createClient } from "@/lib/supabase/server";
-import { criarFornecedorDaNota, criarItemDaNota, vincularFornecedorNota } from "./actions";
+import { criarFornecedorDaNota, criarItemDaNota, desvincularItemNota, vincularFornecedorNota } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -240,7 +240,7 @@ export default async function ConferenciaNotaPage({
                 <dl><div><dt>Compra</dt><dd>{decimal(linha.quantidade_comercial)} {linha.unidade_comercial}</dd></div><div><dt>Valor unitário</dt><dd>{moeda(linha.valor_unitario_comercial)}</dd></div><div><dt>Valor líquido</dt><dd>{moeda(linha.valor_liquido)}</dd></div></dl>
                 <span className={`invoice-link-state ${estado}`}>{linha.ignorado ? "Ignorado" : vinculoCompleto ? "Conferido" : "Pendente"}</span>
               </header>
-              {itemAtual ? <p className="invoice-current-link">Vínculo atual: <strong>{itemAtual.codigo_item} · {itemAtual.nome}</strong> · {decimal(linha.quantidade_convertida)} {linha.codigo_unidade_destino} a {moeda(linha.custo_unitario_convertido)} / {linha.codigo_unidade_destino}</p> : null}
+              {itemAtual ? <div className="invoice-current-link"><span>Vínculo atual: <strong>{itemAtual.codigo_item} · {itemAtual.nome}</strong> · {decimal(linha.quantidade_convertida)} {linha.codigo_unidade_destino} a {moeda(linha.custo_unitario_convertido)} / {linha.codigo_unidade_destino}</span>{nota.status === "em_conferencia" ? <form action={desvincularItemNota}><input type="hidden" name="id_nota" value={nota.id} /><input type="hidden" name="id_item_nota" value={linha.id} /><button className="invoice-unlink-button" type="submit">Desvincular</button></form> : null}</div> : null}
               {nota.status === "em_conferencia" ? <div className="invoice-item-workspace">
                 <InvoiceItemConferenceForm
                   key={`${linha.id}:${linha.id_item ?? "sem-item"}:${linha.fator_conversao}:${linha.ignorado}`}
