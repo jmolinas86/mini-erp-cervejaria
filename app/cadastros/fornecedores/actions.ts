@@ -27,10 +27,13 @@ async function autenticado() {
 function dadosFornecedor(formData: FormData) {
   const nome = texto(formData, "nome");
   const email = texto(formData, "email");
+  const cnpj = texto(formData, "cnpj").replace(/\D/g, "");
   if (!nome) feedback("Informe o nome do fornecedor.", true);
   if (email && !/^\S+@\S+\.\S+$/.test(email)) feedback("Informe um e-mail válido ou deixe o campo vazio.", true);
+  if (cnpj && !/^\d{14}$/.test(cnpj)) feedback("Informe um CNPJ com 14 dígitos ou deixe o campo vazio.", true);
   return {
     nome,
+    cnpj: cnpj || null,
     nome_contato: texto(formData, "nome_contato") || null,
     email: email || null,
     telefone: texto(formData, "telefone") || null,
@@ -41,7 +44,7 @@ function dadosFornecedor(formData: FormData) {
 export async function criarFornecedor(formData: FormData) {
   const supabase = await autenticado();
   const { error } = await supabase.from("fornecedores").insert(dadosFornecedor(formData));
-  if (error) feedback("Não foi possível criar o fornecedor. Confira os dados informados.", true);
+  if (error) feedback(error.code === "23505" ? "Já existe um fornecedor com esse nome ou CNPJ." : "Não foi possível criar o fornecedor. Confira os dados informados.", true);
   feedback("Fornecedor criado com sucesso.");
 }
 
@@ -50,7 +53,7 @@ export async function editarFornecedor(formData: FormData) {
   if (!isUuid(id)) feedback("Fornecedor inválido.", true);
   const supabase = await autenticado();
   const { error } = await supabase.from("fornecedores").update(dadosFornecedor(formData)).eq("id", id);
-  if (error) feedback("Não foi possível atualizar o fornecedor.", true);
+  if (error) feedback(error.code === "23505" ? "Já existe outro fornecedor com esse nome ou CNPJ." : "Não foi possível atualizar o fornecedor.", true);
   feedback("Fornecedor atualizado com sucesso.");
 }
 

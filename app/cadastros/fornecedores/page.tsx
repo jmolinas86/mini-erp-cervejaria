@@ -9,6 +9,7 @@ export const dynamic = "force-dynamic";
 type Fornecedor = {
   id: string;
   nome: string;
+  cnpj: string | null;
   nome_contato: string | null;
   email: string | null;
   telefone: string | null;
@@ -29,11 +30,16 @@ export default async function FornecedoresPage({
 
   let fornecedoresQuery = supabase
     .from("fornecedores")
-    .select("id,nome,nome_contato,email,telefone,observacoes,ativo")
+    .select("id,nome,cnpj,nome_contato,email,telefone,observacoes,ativo")
     .order("ativo", { ascending: false })
     .order("nome", { ascending: true });
   const busca = params.q?.trim();
-  if (busca) fornecedoresQuery = fornecedoresQuery.ilike("nome", `%${busca}%`);
+  if (busca) {
+    const buscaCnpj = busca.replace(/\D/g, "");
+    fornecedoresQuery = buscaCnpj
+      ? fornecedoresQuery.or(`nome.ilike.%${busca}%,cnpj.ilike.%${buscaCnpj}%`)
+      : fornecedoresQuery.ilike("nome", `%${busca}%`);
+  }
   const { data: fornecedores, error } = await fornecedoresQuery;
   const lista = (fornecedores ?? []) as Fornecedor[];
 
@@ -53,6 +59,7 @@ export default async function FornecedoresPage({
           <div className="section-header"><div><p className="eyebrow">Novo registro</p><h2>Cadastrar fornecedor</h2></div><span className="status-pill configured">Cadastro simples</span></div>
           <form className="form-grid" action={criarFornecedor}>
             <label className="form-field"><span>Nome *</span><input name="nome" required placeholder="Ex.: Casa do Malte" /></label>
+            <label className="form-field"><span>CNPJ</span><input name="cnpj" inputMode="numeric" placeholder="00.000.000/0000-00" /></label>
             <label className="form-field"><span>Nome do contato</span><input name="nome_contato" placeholder="Ex.: João" /></label>
             <label className="form-field"><span>E-mail</span><input name="email" type="email" placeholder="contato@fornecedor.com" /></label>
             <label className="form-field"><span>Telefone</span><input name="telefone" placeholder="(00) 00000-0000" /></label>
@@ -63,10 +70,10 @@ export default async function FornecedoresPage({
 
         <section className="panel-card">
           <div className="section-header"><div><p className="eyebrow">Lista atual</p><h2>{lista.length} fornecedores encontrados</h2></div><form className="filter-form" method="get"><input name="q" defaultValue={params.q ?? ""} placeholder="Buscar por nome" /><button className="button secondary" type="submit">Buscar</button></form></div>
-          <div className="table-wrap"><table><thead><tr><th>Fornecedor</th><th>Contato</th><th>E-mail</th><th>Telefone</th><th>Status</th><th>Ações</th></tr></thead><tbody>
+          <div className="table-wrap"><table><thead><tr><th>Fornecedor</th><th>CNPJ</th><th>Contato</th><th>E-mail</th><th>Telefone</th><th>Status</th><th>Ações</th></tr></thead><tbody>
             {lista.map((fornecedor) => <tr key={fornecedor.id}>
-              <td><strong>{fornecedor.nome}</strong><span>{fornecedor.observacoes ?? "Sem observações"}</span></td><td>{fornecedor.nome_contato ?? "—"}</td><td>{fornecedor.email ?? "—"}</td><td>{fornecedor.telefone ?? "—"}</td><td><span className={`table-pill ${fornecedor.ativo ? "ok" : "inativo"}`}>{fornecedor.ativo ? "Ativo" : "Inativo"}</span></td>
-              <td><details className="row-details"><summary>Editar</summary><form className="details-form" action={editarFornecedor}><input type="hidden" name="id" value={fornecedor.id} /><label className="form-field"><span>Nome</span><input name="nome" defaultValue={fornecedor.nome} required /></label><label className="form-field"><span>Nome do contato</span><input name="nome_contato" defaultValue={fornecedor.nome_contato ?? ""} /></label><label className="form-field"><span>E-mail</span><input name="email" type="email" defaultValue={fornecedor.email ?? ""} /></label><label className="form-field"><span>Telefone</span><input name="telefone" defaultValue={fornecedor.telefone ?? ""} /></label><label className="form-field form-field-wide"><span>Observações</span><textarea name="observacoes" rows={2} defaultValue={fornecedor.observacoes ?? ""} /></label><button className="button primary" type="submit">Salvar alterações</button></form><form className="inline-form" action={alternarFornecedor}><input type="hidden" name="id" value={fornecedor.id} /><input type="hidden" name="ativo" value={String(!fornecedor.ativo)} /><button className="button secondary" type="submit">{fornecedor.ativo ? "Inativar fornecedor" : "Reativar fornecedor"}</button></form></details></td>
+              <td><strong>{fornecedor.nome}</strong><span>{fornecedor.observacoes ?? "Sem observações"}</span></td><td>{fornecedor.cnpj ?? "—"}</td><td>{fornecedor.nome_contato ?? "—"}</td><td>{fornecedor.email ?? "—"}</td><td>{fornecedor.telefone ?? "—"}</td><td><span className={`table-pill ${fornecedor.ativo ? "ok" : "inativo"}`}>{fornecedor.ativo ? "Ativo" : "Inativo"}</span></td>
+              <td><details className="row-details"><summary>Editar</summary><form className="details-form" action={editarFornecedor}><input type="hidden" name="id" value={fornecedor.id} /><label className="form-field"><span>Nome</span><input name="nome" defaultValue={fornecedor.nome} required /></label><label className="form-field"><span>CNPJ</span><input name="cnpj" inputMode="numeric" defaultValue={fornecedor.cnpj ?? ""} /></label><label className="form-field"><span>Nome do contato</span><input name="nome_contato" defaultValue={fornecedor.nome_contato ?? ""} /></label><label className="form-field"><span>E-mail</span><input name="email" type="email" defaultValue={fornecedor.email ?? ""} /></label><label className="form-field"><span>Telefone</span><input name="telefone" defaultValue={fornecedor.telefone ?? ""} /></label><label className="form-field form-field-wide"><span>Observações</span><textarea name="observacoes" rows={2} defaultValue={fornecedor.observacoes ?? ""} /></label><button className="button primary" type="submit">Salvar alterações</button></form><form className="inline-form" action={alternarFornecedor}><input type="hidden" name="id" value={fornecedor.id} /><input type="hidden" name="ativo" value={String(!fornecedor.ativo)} /><button className="button secondary" type="submit">{fornecedor.ativo ? "Inativar fornecedor" : "Reativar fornecedor"}</button></form></details></td>
             </tr>)}
           </tbody></table></div>
         </section>

@@ -11,7 +11,7 @@ Mini ERP para cervejaria caseira, sem modulo fiscal, com foco em estoque, receit
 - Fase atual: Fase 9 - Custos, dashboard e relatórios.
 - Fase 10 em andamento: finalização e preparação do MVP para publicação.
 - Fase 11 em andamento: experiência móvel e instalação como PWA.
-- Módulo de notas de entrada: Fase 2 concluída (importação segura do XML para conferência).
+- Módulo de notas de entrada: Fase 3 concluída (conferência, vínculos e conversões antes do estoque).
 - Auth por email e senha configurado com sessões SSR e rotas protegidas.
 - Painel inicial autenticado lendo estoque e brassagens do Supabase.
 
@@ -28,6 +28,7 @@ Mini ERP para cervejaria caseira, sem modulo fiscal, com foco em estoque, receit
 - `docs/fase-11-pwa-mobile.md`: instalação no celular e experiência móvel.
 - `docs/fase-1-notas-entrada.md`: modelo de dados e regras do módulo de notas de entrada.
 - `docs/fase-2-notas-entrada.md`: importação, validação e armazenamento privado do XML da NF-e.
+- `docs/fase-3-notas-entrada.md`: conferência do fornecedor, itens e unidades da NF-e.
 - `docs/supabase-conexao.md`: passo a passo para executar e validar o banco no Supabase.
 - `database/migrations/001_initial_schema.sql`: primeira versao do schema PostgreSQL.
 - `database/migrations/002_supabase_advisor_fixes.sql`: ajustes recomendados pelo Supabase Advisor.

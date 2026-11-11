@@ -52,9 +52,18 @@ function objeto(value: unknown): XmlNode | null {
     : null;
 }
 
+export function decodificarEntidadesXmlBasicas(value: string) {
+  return value
+    .replaceAll("&amp;", "&")
+    .replaceAll("&lt;", "<")
+    .replaceAll("&gt;", ">")
+    .replaceAll("&quot;", "\"")
+    .replaceAll("&apos;", "'");
+}
+
 function texto(value: unknown) {
   return typeof value === "string" || typeof value === "number"
-    ? String(value).trim()
+    ? decodificarEntidadesXmlBasicas(String(value).trim())
     : "";
 }
 

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
+import { decodificarEntidadesXmlBasicas } from "@/lib/nfe/xml";
 import { createClient } from "@/lib/supabase/server";
 import { importarXmlNfe } from "./actions";
 
@@ -149,7 +150,7 @@ export default async function NotasEntradaPage({
                   <summary>
                     <span className="invoice-document-icon" aria-hidden="true">▤</span>
                     <span className="invoice-main-data">
-                      <strong>{nota.fornecedor_razao_social ?? "Fornecedor não informado"}</strong>
+                      <strong>{nota.fornecedor_razao_social ? decodificarEntidadesXmlBasicas(nota.fornecedor_razao_social) : "Fornecedor não informado"}</strong>
                       <small>CNPJ {cnpj(nota.fornecedor_cnpj)} · NF {nota.numero_documento ?? "—"} / Série {nota.serie_documento ?? "—"}</small>
                     </span>
                     <span><small>Emissão</small><strong>{data(nota.emitida_em)}</strong></span>
@@ -163,6 +164,7 @@ export default async function NotasEntradaPage({
                       <span><strong>Arquivo original</strong>{nota.arquivo_nome ?? "—"}</span>
                       <span><strong>Importado em</strong>{data(nota.criado_em)}</span>
                       <span><strong>Chave de acesso</strong><code>{nota.chave_acesso ?? "—"}</code></span>
+                      <Link className="button primary" href={`/estoque/notas/${nota.id}`}>Conferir nota →</Link>
                     </div>
                     <div className="table-wrap">
                       <table className="invoice-items-table">
